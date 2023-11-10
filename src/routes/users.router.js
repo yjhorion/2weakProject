@@ -10,7 +10,18 @@ const router = express.Router();
 router.post('/sign-up', async (req, res) => {
   try {
     const validation = await createSignUp.validateAsync(req.body);
+    //   , {
+    //   context: {
+    //     nickname: req.body.nickname,
+    //   },
+    // });
     const { nickname, password, type } = validation;
+
+    if (password.includes(nickname)) {
+      return res
+        .status(400)
+        .json({ mesaage: 'password에 nickname이 포함되면 안됩니다.' });
+    }
 
     const isExistNickname = await prisma.users.findFirst({
       where: { nickname },
@@ -20,15 +31,15 @@ router.post('/sign-up', async (req, res) => {
       return res.status(400).json({ message: '입력한 nickname 회원이 존재합니다.' });
     }
 
-    const hasedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await prisma.users.create({
-      data: { nickname, password: hasedPassword, type },
+      data: { nickname, password: hashedPassword, type },
     });
 
     return res.status(200).json({ message: '회원가입에 성공하였습니다.' });
   } catch (error) {
-    //에러 미들웨어를 만들었는데 이게 끝인가...뭔가 더 활용하는 방법이 있을듯 ..next()는 오류가 떴음
+    console.log(error);
     return res.status(400).json({ error: error.message });
   }
 });

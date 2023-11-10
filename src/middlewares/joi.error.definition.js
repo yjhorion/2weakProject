@@ -1,10 +1,12 @@
 import joi from 'joi';
 
-const checkPassword = function (val) {
-  if (val.includes(nickname)) {
-    return error;
-  }
-};
+// const checkPassword = async function (value, options) {
+//   const { nickname } = options;
+//   if (value.includes(nickname)) {
+//     throw new Error('any.custom');
+//   }
+//   return value;
+// };
 
 const createSignUp = joi.object({
   nickname: joi.string().alphanum().min(3).max(15).messages({
@@ -17,12 +19,14 @@ const createSignUp = joi.object({
     .alphanum()
     .min(8)
     .max(20)
-    .custom(checkPassword, 'custom validation')
+    // .custom(checkPassword, 'any.custom')
+    // .disallow(joi.ref('nickname'))
     .messages({
       'string.min': 'password를 8글자 이상으로 작성해주세요.',
       'string.max': 'password를 20글자 이하으로 작성해주세요.',
       'string.empty': 'password를 입력해주세요.',
-      'any.custom': 'password에 nickname이 포함되면 안됩니다.',
+      // 'any.custom': 'password에 nickname이 포함되면 안됩니다.',
+      // 'any.invalid': 'password에 nickname이 포함되면 안됩니다.',
     }),
   type: joi.string().valid('OWNER', 'CUSTOMER').messages({
     'any.only': 'CUSTOMER와 OWNER 중 선택하여 입력해주세요.',
