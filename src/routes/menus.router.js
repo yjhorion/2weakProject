@@ -6,52 +6,60 @@ import { createMenus } from '../middlewares/joi.error.definition.js';
 const router = express.Router();
 
 /** 메뉴 등록 **/
-router.post('/categories/:categoryId/menus', authMiddleware, async (req, res) => {
-  try {
-    const validation = await createMenus.validateAsync(req.body);
-    const { name, description, image, price, order } = req.body;
-    const { categoryId } = req.params;
-    const { userId } = req.user;
+router.post(
+  '/categories/:categoryId/menus',
+  authMiddleware,
+  async (req, res) => {
+    try {
+      const validation = await createMenus.validateAsync(req.body);
+      const { name, description, image, price, order } = req.body;
+      const { categoryId } = req.params;
+      const { userId } = req.user;
 
-    const user = await prisma.Users.findFirst({
-      where: { userId: Number(userId) },
-    });
+      const user = await prisma.Users.findFirst({
+        where: { userId: Number(userId) },
+      });
 
-    if (user.type !== 'OWNER') {
-      return res.status(400).json({ message: '사장님만 사용할 수 있는 API입니다.' });
+      if (user.type !== 'OWNER') {
+        return res
+          .status(400)
+          .json({ message: '사장님만 사용할 수 있는 API입니다.' });
+      }
+      //deletedAt이 null인 카테고리는 메뉴 등록이 안되도록
+      const Category = await prisma.categories.findFirst({
+        where: { categoryId: Number(categoryId), deletedAt: null },
+      });
+
+      if (!Category) {
+        return res
+          .status(400)
+          .json({ message: '존재하지 않는 카테고리입니다.' });
+      }
+
+      const maxOrder = await prisma.menus.findFirst({
+        orderBy: { order: 'desc' },
+      });
+
+      const orderIncreased = maxOrder ? maxOrder.order + 1 : 1;
+
+      await prisma.menus.create({
+        data: {
+          CategoryId: Number(categoryId),
+          UserId: Number(userId),
+          name,
+          description,
+          image,
+          price,
+          order: Number(orderIncreased),
+        },
+      });
+
+      return res.status(200).json({ message: '메뉴를 등록하였습니다.' });
+    } catch (error) {
+      return res.status(400).json({ error: error.message });
     }
-    //deletedAt이 null인 카테고리는 메뉴 등록이 안되도록하는거
-    const Category = await prisma.categories.findFirst({
-      where: { categoryId: Number(categoryId), deletedAt: null },
-    });
-
-    if (!Category) {
-      return res.status(400).json({ message: '존재하지 않는 카테고리입니다.' });
-    }
-
-    const maxOrder = await prisma.menus.findFirst({
-      orderBy: { order: 'desc' },
-    });
-
-    const orderIncreased = maxOrder ? maxOrder.order + 1 : 1; //order + 1 해주기 위함. (id는 따로 있어서 autoincrement불가로 인하여 불가피하게 +1씩 해줌)
-
-    await prisma.menus.create({
-      data: {
-        CategoryId: Number(categoryId),
-        UserId: Number(userId),
-        name,
-        description,
-        image,
-        price,
-        order: Number(orderIncreased),
-      },
-    });
-
-    return res.status(200).json({ message: '메뉴를 등록하였습니다.' });
-  } catch (error) {
-    return res.status(400).json({ error: error.message });
-  }
-});
+  },
+);
 
 /** 카테고리별 메뉴 조회 **/
 router.get('/categories/:categoryId/menus', async (req, res) => {
@@ -74,7 +82,11 @@ router.get('/categories/:categoryId/menus', async (req, res) => {
         order: true,
         status: true,
       },
-      where: { CategoryId: +categoryId, deletedAt: null, Category: { deletedAt: null } },
+      where: {
+        CategoryId: +categoryId,
+        deletedAt: null,
+        Category: { deletedAt: null },
+      },
       orderBy: { order: 'asc' },
     });
 
@@ -102,7 +114,11 @@ router.get('/categories/:categoryId/menus/:menuId', async (req, res) => {
     }
 
     const menu = await prisma.menus.findFirst({
-      where: { CategoryId: Number(categoryId), menuId: Number(menuId), deletedAt: null },
+      where: {
+        CategoryId: Number(categoryId),
+        menuId: Number(menuId),
+        deletedAt: null,
+      },
       select: {
         CategoryId: true,
         name: true,
@@ -140,7 +156,9 @@ router.patch(
       });
 
       if (user.type !== 'OWNER') {
-        return res.status(400).json({ message: '사장님만 사용할 수 있는 API입니다.' });
+        return res
+          .status(400)
+          .json({ message: '사장님만 사용할 수 있는 API입니다.' });
       }
 
       const menu = await prisma.menus.findFirst({
@@ -195,7 +213,9 @@ router.delete(
       });
 
       if (user.type !== 'OWNER') {
-        return res.status(400).json({ message: '사장님만 사용할 수 있는 API입니다.' });
+        return res
+          .status(400)
+          .json({ message: '사장님만 사용할 수 있는 API입니다.' });
       }
 
       const menu = await prisma.menus.findFirst({

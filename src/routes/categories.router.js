@@ -17,7 +17,9 @@ router.post('/categories', authMiddleware, async (req, res, next) => {
     });
 
     if (user.type !== 'OWNER') {
-      return res.status(400).json({ message: '사장님만 사용할 수 있는 API입니다.' });
+      return res
+        .status(400)
+        .json({ message: '사장님만 사용할 수 있는 API입니다.' });
     }
 
     const maxOrder = await prisma.Categories.findFirst({
@@ -87,7 +89,9 @@ router.patch('/categories/:categoryId', authMiddleware, async (req, res) => {
     });
 
     if (user.type !== 'OWNER') {
-      return res.status(400).json({ message: '사장님만 사용할 수 있는 API입니다.' });
+      return res
+        .status(400)
+        .json({ message: '사장님만 사용할 수 있는 API입니다.' });
     }
 
     const currentCategory = await prisma.Categories.findFirst({
@@ -131,7 +135,9 @@ router.delete('/categories/:categoryId', authMiddleware, async (req, res) => {
     });
 
     if (user.type !== 'OWNER') {
-      return res.status(400).json({ message: '사장님만 사용할 수 있는 API입니다.' });
+      return res
+        .status(400)
+        .json({ message: '사장님만 사용할 수 있는 API입니다.' });
     }
 
     const category = await prisma.Categories.findFirst({
