@@ -1,9 +1,14 @@
 import joi from 'joi';
 
-// const checkPassword = async function (value, options) {
-//   const { nickname } = options;
+// const checkPassword = function (value, options) {
+//   const nickname = options.context;
+//   console.log('닉넴', nickname);
+//   console.log('옵션', options); // context가 있는데 왜 못받아오지?
+//   console.log('옵션안의 콘텍스트', options[context]); //여기만 내려와도 undefined가 되어버림
+//   console.log('옵션안의 콘텍스트 안의 닉넴', options.context.nickname);
 //   if (value.includes(nickname)) {
-//     throw new Error('any.custom');
+//     return console.log('나왔다!!');
+//     // return helpers.error('any.custom');
 //   }
 //   return value;
 // };
@@ -19,14 +24,14 @@ const createSignUp = joi.object({
     .alphanum()
     .min(8)
     .max(20)
-    // .custom(checkPassword, 'any.custom')
-    // .disallow(joi.ref('nickname'))
+    // .custom(checkPassword, 'any.custom') //1. 방법1 (계속 password에 nicckname이 포함되면 안된다고만 나옴)
+    // .disallow(joi.ref('nickname')) //2. 방법2 (동일해야만 인식함)
     .messages({
       'string.min': 'password를 8글자 이상으로 작성해주세요.',
       'string.max': 'password를 20글자 이하으로 작성해주세요.',
       'string.empty': 'password를 입력해주세요.',
-      // 'any.custom': 'password에 nickname이 포함되면 안됩니다.',
-      // 'any.invalid': 'password에 nickname이 포함되면 안됩니다.',
+      'any.custom': '비번이랑 닉넴이랑 안맞아요',
+      'any.invalid': 'password에 nickname이 포함되면 안됩니다.',
     }),
   type: joi.string().valid('OWNER', 'CUSTOMER').messages({
     'any.only': 'CUSTOMER와 OWNER 중 선택하여 입력해주세요.',

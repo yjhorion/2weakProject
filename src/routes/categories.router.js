@@ -23,12 +23,12 @@ router.post('/categories', authMiddleware, async (req, res, next) => {
     const maxOrder = await prisma.Categories.findFirst({
       orderBy: { order: 'desc' },
     });
-    const orderPlus = maxOrder ? maxOrder.order + 1 : 1; //order+1 해주기 위함. (id는 따로 있어서 autoincrement불가로 인하여 불가피하게 +1씩 해줌)
+    const orderIncreased = maxOrder ? maxOrder.order + 1 : 1; //order+1 해주기 위함. (id는 따로 있어서 autoincrement불가로 인하여 불가피하게 +1씩 해줌)
 
     await prisma.Categories.create({
       data: {
         name,
-        order: Number(orderPlus),
+        order: Number(orderIncreased),
         User: {
           connect: {
             userId: Number(userId),
@@ -61,6 +61,7 @@ router.get('/categories', authMiddleware, async (req, res) => {
         order: true,
       },
       orderBy: { order: 'asc' },
+      where: { deletedAt: null },
     });
 
     if (!category) {
@@ -90,7 +91,7 @@ router.patch('/categories/:categoryId', authMiddleware, async (req, res) => {
     }
 
     const currentCategory = await prisma.Categories.findFirst({
-      where: { order: +order },
+      where: { order: Number(order), deletedAt: null },
     });
 
     if (currentCategory) {
@@ -100,11 +101,15 @@ router.patch('/categories/:categoryId', authMiddleware, async (req, res) => {
         },
         data: { order: { increment: 1 } },
       });
+    } else {
+      return res.status(400).json({ message: '존재하지않는 카테고리입니다.' });
     }
-
+    //삭제처리된 데이터를 삭제하려고 하면 오류발생
+    // An operation failed because it depends on one or more records that were required but not found. Record to update not found.
     await prisma.Categories.update({
       where: {
         categoryId: Number(categoryId),
+        deletedAt: null,
       },
       data: { name, order },
     });
@@ -130,14 +135,18 @@ router.delete('/categories/:categoryId', authMiddleware, async (req, res) => {
     }
 
     const category = await prisma.Categories.findFirst({
-      where: { categoryId: +categoryId },
+      where: { categoryId: Number(categoryId), deletedAt: null },
     });
 
     if (!category) {
       return res.status(400).json({ message: '존재하지않는 카테고리입니다.' });
     }
 
-    await prisma.Categories.delete({ where: { categoryId: +categoryId } });
+    // await prisma.Categories.delete({ where: { categoryId: +categoryId } });
+    await prisma.Categories.update({
+      where: { categoryId: Number(categoryId) },
+      data: { deletedAt: new Date() },
+    });
 
     return res.status(200).json({ messge: '카테고리 정보를 삭제하였습니다.' });
   } catch (error) {

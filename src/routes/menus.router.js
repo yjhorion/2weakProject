@@ -20,8 +20,12 @@ router.post('/categories/:categoryId/menus', authMiddleware, async (req, res) =>
     if (user.type !== 'OWNER') {
       return res.status(400).json({ message: '사장님만 사용할 수 있는 API입니다.' });
     }
+    //deletedAt이 null인 카테고리는 메뉴 등록이 안되도록하는거
+    const Category = await prisma.categories.findFirst({
+      where: { categoryId: Number(categoryId), deletedAt: null },
+    });
 
-    if (!categoryId) {
+    if (!Category) {
       return res.status(400).json({ message: '존재하지 않는 카테고리입니다.' });
     }
 
@@ -29,7 +33,7 @@ router.post('/categories/:categoryId/menus', authMiddleware, async (req, res) =>
       orderBy: { order: 'desc' },
     });
 
-    const orderPlus = maxOrder ? maxOrder.order + 1 : 1; //order + 1 해주기 위함. (id는 따로 있어서 autoincrement불가로 인하여 불가피하게 +1씩 해줌)
+    const orderIncreased = maxOrder ? maxOrder.order + 1 : 1; //order + 1 해주기 위함. (id는 따로 있어서 autoincrement불가로 인하여 불가피하게 +1씩 해줌)
 
     await prisma.menus.create({
       data: {
@@ -39,7 +43,7 @@ router.post('/categories/:categoryId/menus', authMiddleware, async (req, res) =>
         description,
         image,
         price,
-        order: Number(orderPlus),
+        order: Number(orderIncreased),
       },
     });
 
@@ -54,6 +58,13 @@ router.get('/categories/:categoryId/menus', async (req, res) => {
   try {
     const { categoryId } = req.params;
 
+    const category = await prisma.categories.findFirst({
+      where: { categoryId: Number(categoryId), deletedAt: null },
+    });
+
+    if (!category) {
+      return res.status(400).json({ message: '존재하지않는 카테고리입니다.' });
+    }
     const menu = await prisma.menus.findMany({
       select: {
         menuId: true,
@@ -63,7 +74,7 @@ router.get('/categories/:categoryId/menus', async (req, res) => {
         order: true,
         status: true,
       },
-      where: { CategoryId: +categoryId },
+      where: { CategoryId: +categoryId, deletedAt: null, Category: { deletedAt: null } },
       orderBy: { order: 'asc' },
     });
 
@@ -82,12 +93,16 @@ router.get('/categories/:categoryId/menus/:menuId', async (req, res) => {
   try {
     const { categoryId, menuId } = req.params;
 
-    if (!categoryId || !menuId) {
-      return res.status(400).json({ message: '데이터 형식이 올바르지 않습니다.' });
+    const category = await prisma.categories.findFirst({
+      where: { categoryId: Number(categoryId), deletedAt: null },
+    });
+
+    if (!category) {
+      return res.status(400).json({ message: '존재하지않는 카테고리입니다.' });
     }
 
     const menu = await prisma.menus.findFirst({
-      where: { CategoryId: Number(categoryId), menuId: Number(menuId) },
+      where: { CategoryId: Number(categoryId), menuId: Number(menuId), deletedAt: null },
       select: {
         CategoryId: true,
         name: true,
@@ -129,7 +144,11 @@ router.patch(
       }
 
       const menu = await prisma.menus.findFirst({
-        where: { CategoryId: Number(categoryId), menuId: Number(menuId) },
+        where: {
+          CategoryId: Number(categoryId),
+          menuId: Number(menuId),
+          deletedAt: null,
+        },
       });
 
       if (!menu) {
@@ -137,7 +156,7 @@ router.patch(
       }
 
       const currentMenu = await prisma.menus.findFirst({
-        where: { order: Number(order) },
+        where: { order: Number(order), deletedAt: null },
       });
 
       if (currentMenu) {
@@ -180,14 +199,23 @@ router.delete(
       }
 
       const menu = await prisma.menus.findFirst({
-        where: { CategoryId: Number(categoryId), menuId: Number(menuId) },
+        where: {
+          CategoryId: Number(categoryId),
+          menuId: Number(menuId),
+          deletedAt: null,
+        },
       });
 
       if (!menu) {
         return res.status(400).json({ error: '메뉴가 존재하지않습니다.' });
       }
-      await prisma.menus.delete({
+      // await prisma.menus.delete({
+      //   where: { CategoryId: Number(categoryId), menuId: Number(menuId) },
+      // });
+
+      await prisma.menus.update({
         where: { CategoryId: Number(categoryId), menuId: Number(menuId) },
+        data: { deletedAt: new Date() },
       });
 
       return res.status(200).json({ message: '메뉴를 삭제하였습니다.' });

@@ -23,13 +23,14 @@ model Users {
 }
 
 model Categories {
-  categoryId Int      @id @default(autoincrement()) @map("categoryId")
-  UserId     Int      @map("UserId")
-  name       String   @map("name")
-  order      Int      @map("order")
+  categoryId Int       @id @default(autoincrement()) @map("categoryId")
+  UserId     Int       @map("UserId")
+  name       String    @map("name")
+  order      Int       @map("order")
+  deletedAt  DateTime? @map("deletedAt")
 
   Menus Menus[]       
-  User  Users         @relation(fields: [UserId], references: [userId], onDelete: Cascade)
+  User  Users         @relation(fields: [UserId], references: [userId])
 
   @@map("Categories")
 }
@@ -44,9 +45,10 @@ model Menus {
   image       String    @map("image")
   price       Int       @map("price")
   status      String    @default("FOR_SALE") @map("status")
+  deletedAt   DateTime? @map("deletedAt")
 
-  Category Categories   @relation(fields: [CategoryId], references: [categoryId], onDelete: Cascade)
-  User     Users        @relation(fields: [UserId], references: [userId], onDelete: Cascade)
+  Category Categories   @relation(fields: [CategoryId], references: [categoryId], onUpdate: Cascade)
+  User     Users        @relation(fields: [UserId], references: [userId])
 
   @@map("Menus")
 }

@@ -10,7 +10,7 @@ const router = express.Router();
 router.post('/sign-up', async (req, res) => {
   try {
     const validation = await createSignUp.validateAsync(req.body);
-    //   , {
+    // , {
     //   context: {
     //     nickname: req.body.nickname,
     //   },
