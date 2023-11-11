@@ -105,11 +105,16 @@ router.patch('/categories/:categoryId', authMiddleware, async (req, res) => {
         },
         data: { order: { increment: 1 } },
       });
-    } else {
+    }
+
+    const category = await prisma.Categories.findFirst({
+      where: { categoryId: Number(categoryId), deletedAt: null },
+    });
+
+    if (!category) {
       return res.status(400).json({ message: '존재하지않는 카테고리입니다.' });
     }
-    //삭제처리된 데이터를 삭제하려고 하면 오류발생
-    // An operation failed because it depends on one or more records that were required but not found. Record to update not found.
+
     await prisma.Categories.update({
       where: {
         categoryId: Number(categoryId),
@@ -148,7 +153,6 @@ router.delete('/categories/:categoryId', authMiddleware, async (req, res) => {
       return res.status(400).json({ message: '존재하지않는 카테고리입니다.' });
     }
 
-    // await prisma.Categories.delete({ where: { categoryId: +categoryId } });
     await prisma.Categories.update({
       where: { categoryId: Number(categoryId) },
       data: { deletedAt: new Date() },
