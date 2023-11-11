@@ -10,14 +10,9 @@ import {
 const router = express.Router();
 
 /** 회원가입 API **/
-router.post('/sign-up', async (req, res) => {
+router.post('/sign-up', async (req, res, next) => {
   try {
     const validation = await createSignUp.validateAsync(req.body);
-    // , {
-    //   context: {
-    //     nickname: req.body.nickname,
-    //   },
-    // });
     const { nickname, password, type } = validation;
 
     if (password.includes(nickname)) {
@@ -64,7 +59,7 @@ router.post('/sign-in', async (req, res, next) => {
     } else if (!(await bcrypt.compare(password, user.password))) {
       return res.status(400).json({ message: 'password를 확인해주세요.' });
     }
-    //user가 있다면 user의 userId를 jwt로 바꾸고 쿠키로 Bearer형식으로 클라이언트한테 응답을 보내준다.
+
     const token = jwt.sign({ userId: user.userId }, 'secretKey', {
       expiresIn: '30s',
     });

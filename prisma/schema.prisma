@@ -27,6 +27,7 @@ model Categories {
   UserId     Int       @map("UserId")
   name       String    @map("name")
   order      Int       @map("order")
+  author     String    @map("author")  //신규
   deletedAt  DateTime? @map("deletedAt")
 
   Menus Menus[]       
@@ -44,6 +45,7 @@ model Menus {
   description String    @map("description")
   image       String    @map("image")
   price       Int       @map("price")
+  author      String    @map("author")  //신규
   status      String    @default("FOR_SALE") @map("status")
   deletedAt   DateTime? @map("deletedAt")
 
@@ -52,4 +54,3 @@ model Menus {
 
   @@map("Menus")
 }
-

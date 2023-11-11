@@ -9,10 +9,10 @@ const router = express.Router();
 router.post(
   '/categories/:categoryId/menus',
   authMiddleware,
-  async (req, res) => {
+  async (req, res, next) => {
     try {
       const validation = await createMenus.validateAsync(req.body);
-      const { name, description, image, price, order } = req.body;
+      const { name, description, image, price, order } = validation;
       const { categoryId } = req.params;
       const { userId } = req.user;
 
@@ -62,7 +62,7 @@ router.post(
 );
 
 /** 카테고리별 메뉴 조회 **/
-router.get('/categories/:categoryId/menus', async (req, res) => {
+router.get('/categories/:categoryId/menus', async (req, res, next) => {
   try {
     const { categoryId } = req.params;
 
@@ -70,9 +70,6 @@ router.get('/categories/:categoryId/menus', async (req, res) => {
       where: { categoryId: Number(categoryId), deletedAt: null },
     });
 
-    if (!category) {
-      return res.status(400).json({ message: '존재하지않는 카테고리입니다.' });
-    }
     const menu = await prisma.menus.findMany({
       select: {
         menuId: true,
@@ -83,15 +80,17 @@ router.get('/categories/:categoryId/menus', async (req, res) => {
         status: true,
       },
       where: {
-        CategoryId: +categoryId,
+        CategoryId: Number(categoryId),
         deletedAt: null,
         Category: { deletedAt: null },
       },
       orderBy: { order: 'asc' },
     });
 
-    if (!menu) {
-      return res.status(400).json({ message: '존재하지 않는 메뉴입니다.' });
+    if (!category) {
+      return res.status(400).json({ error: '존재하지 않은 카테고리입니다.' });
+    } else if (!menu) {
+      return res.status(400).json({ error: '존재하지 않은 메뉴입니다.' });
     }
 
     return res.status(200).json({ data: menu });
@@ -101,17 +100,13 @@ router.get('/categories/:categoryId/menus', async (req, res) => {
 });
 
 /** 메뉴 상세 조회 **/
-router.get('/categories/:categoryId/menus/:menuId', async (req, res) => {
+router.get('/categories/:categoryId/menus/:menuId', async (req, res, next) => {
   try {
     const { categoryId, menuId } = req.params;
 
     const category = await prisma.categories.findFirst({
       where: { categoryId: Number(categoryId), deletedAt: null },
     });
-
-    if (!category) {
-      return res.status(400).json({ message: '존재하지않는 카테고리입니다.' });
-    }
 
     const menu = await prisma.menus.findFirst({
       where: {
@@ -134,8 +129,10 @@ router.get('/categories/:categoryId/menus/:menuId', async (req, res) => {
       },
     });
 
-    if (!menu) {
-      return res.status(400).json({ message: '존재하지 않는 메뉴입니다.' });
+    if (!category) {
+      return res.status(400).json({ error: '존재하지 않은 카테고리입니다.' });
+    } else if (!menu) {
+      return res.status(400).json({ error: '존재하지 않은 메뉴입니다.' });
     }
 
     return res.status(200).json({ data: menu });
@@ -148,7 +145,7 @@ router.get('/categories/:categoryId/menus/:menuId', async (req, res) => {
 router.patch(
   '/categories/:categoryId/menus/:menuId',
   authMiddleware,
-  async (req, res) => {
+  async (req, res, next) => {
     try {
       const validation = await createMenus.validateAsync(req.body);
       const { name, description, price, order, status } = validation;
@@ -165,7 +162,6 @@ router.patch(
           .json({ message: '사장님만 사용할 수 있는 API입니다.' });
       }
 
-      //경로매개변수 오기재시 잡아주기 위함.
       const category = await prisma.categories.findFirst({
         where: { categoryId: Number(categoryId), deletedAt: null },
       });
@@ -217,7 +213,7 @@ router.patch(
 router.delete(
   '/categories/:categoryId/menus/:menuId',
   authMiddleware,
-  async (req, res) => {
+  async (req, res, next) => {
     try {
       const { categoryId, menuId } = req.params;
       const { userId } = req.user;
