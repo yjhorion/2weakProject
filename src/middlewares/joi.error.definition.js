@@ -88,4 +88,19 @@ const createCategories = joi.object({
   order: joi.number(),
 });
 
-export { createSignUp, createSignIn, createMenus, createCategories };
+const createOrders = joi.object({
+  menuId: joi.number(),
+  quantity: joi.number(),
+  status: joi.string().valid('PENDING', 'ACCEPTED', 'CANCEL').messages({
+    'any.only':
+      '주문대기: PENDING, 접수완료: ACCEPTED, 주문취소: CANCEL 입니다. 세가지 중 하나만 적어주세요',
+  }),
+});
+
+export {
+  createSignUp,
+  createSignIn,
+  createMenus,
+  createCategories,
+  createOrders,
+};
