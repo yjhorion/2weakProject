@@ -66,7 +66,6 @@ model Orders {
   status     String    @default("PENDING") @map("status")
   totalPrice Int       @map("totalPrice")
   orderedAt  DateTime  @map("orderedAt")
-  deletedAt  DateTime? @map("deletedAt")
 
   User Users @relation(fields:[UserId], references:[userId], onUpdate: Cascade)
   Menu Menus @relation(fields:[MenuId], references:[menuId], onUpdate: Cascade)
