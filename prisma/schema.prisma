@@ -1,3 +1,4 @@
+
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
@@ -18,6 +19,7 @@ model Users {
   
   Categories Categories[]
   Menus      Menus[]
+  Orders     Orders[]
 
   @@map("Users")
 }
@@ -27,7 +29,7 @@ model Categories {
   UserId     Int       @map("UserId")
   name       String    @map("name")
   order      Int       @map("order")
-  author     String    @map("author")  //신규
+  author      String   @map("author")  //신규
   deletedAt  DateTime? @map("deletedAt")
 
   Menus Menus[]       
@@ -49,8 +51,25 @@ model Menus {
   status      String    @default("FOR_SALE") @map("status")
   deletedAt   DateTime? @map("deletedAt")
 
+  Orders   Orders[]
   Category Categories   @relation(fields: [CategoryId], references: [categoryId], onUpdate: Cascade)
   User     Users        @relation(fields: [UserId], references: [userId])
 
   @@map("Menus")
+}
+
+model Orders {
+  orderId    Int       @id @default(autoincrement()) @map("orderId")
+  UserId     Int       @map("UserId")
+  MenuId     Int       @map("MenuId")
+  quantity   Int       @map("quantity")
+  status     String    @default("PENDING") @map("status")
+  totalPrice Int       @map("totalPrice")
+  orderedAt  DateTime  @map("orderedAt")
+  deletedAt  DateTime? @map("deletedAt")
+
+  User Users @relation(fields:[UserId], references:[userId], onUpdate: Cascade)
+  Menu Menus @relation(fields:[MenuId], references:[menuId], onUpdate: Cascade)
+
+  @@map("Orders")
 }
