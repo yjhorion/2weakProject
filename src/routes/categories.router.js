@@ -10,13 +10,9 @@ router.post('/categories', authMiddleware, async (req, res, next) => {
   try {
     const validation = await createCategories.validateAsync(req.body);
     const { name } = validation;
-    const { userId } = req.user;
+    const { userId, type } = req.user;
 
-    const user = await prisma.Users.findFirst({
-      where: { userId: Number(userId) },
-    });
-
-    if (user.type !== 'OWNER') {
+    if (type !== 'OWNER') {
       return res
         .status(400)
         .json({ message: '사장님만 사용할 수 있는 API입니다.' });
@@ -43,7 +39,7 @@ router.post('/categories', authMiddleware, async (req, res, next) => {
     });
     return res.status(200).json({ message: '카테고리를 등록하였습니다.' });
   } catch (error) {
-    return res.status(400).json({ error: error.message });
+    next(error);
   }
 });
 
@@ -67,7 +63,7 @@ router.get('/categories', async (req, res, next) => {
 
     return res.status(200).json({ data: category });
   } catch (error) {
-    return res.status(400).json({ error: error.message });
+    next(error);
   }
 });
 
@@ -80,13 +76,9 @@ router.patch(
       const validation = await createCategories.validateAsync(req.body);
       const { name, order } = validation;
       const { categoryId } = req.params;
-      const { userId } = req.user;
+      const { userId, type } = req.user;
 
-      const user = await prisma.Users.findFirst({
-        where: { userId: Number(userId) },
-      });
-
-      if (user.type !== 'OWNER') {
+      if (type !== 'OWNER') {
         return res
           .status(400)
           .json({ message: '사장님만 사용할 수 있는 API입니다.' });
@@ -131,7 +123,7 @@ router.patch(
         .status(200)
         .json({ messge: '카테고리 정보를 수정하였습니다.' });
     } catch (error) {
-      return res.status(400).json({ error: error.message });
+      next(error);
     }
   },
 );
@@ -143,13 +135,9 @@ router.delete(
   async (req, res, next) => {
     try {
       const { categoryId } = req.params;
-      const { userId } = req.user;
+      const { userId, type } = req.user;
 
-      const user = await prisma.Users.findFirst({
-        where: { userId: Number(userId) },
-      });
-
-      if (user.type !== 'OWNER') {
+      if (type !== 'OWNER') {
         return res
           .status(400)
           .json({ message: '사장님만 사용할 수 있는 API입니다.' });
@@ -187,7 +175,7 @@ router.delete(
         .status(200)
         .json({ messge: '카테고리 정보를 삭제하였습니다.' });
     } catch (error) {
-      return res.status(400).json({ error: error.message });
+      next(error);
     }
   },
 );

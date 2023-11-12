@@ -14,13 +14,9 @@ router.post(
       const validation = await createMenus.validateAsync(req.body);
       const { name, description, image, price, order } = validation;
       const { categoryId } = req.params;
-      const { userId } = req.user;
+      const { userId, type } = req.user;
 
-      const user = await prisma.Users.findFirst({
-        where: { userId: Number(userId) },
-      });
-
-      if (user.type !== 'OWNER') {
+      if (type !== 'OWNER') {
         return res
           .status(400)
           .json({ message: '사장님만 사용할 수 있는 API입니다.' });
@@ -42,6 +38,12 @@ router.post(
 
       const orderIncreased = maxOrder ? maxOrder.order + 1 : 1;
 
+      const author = (
+        await prisma.users.findFirst({
+          where: { userId: userId },
+        })
+      ).nickname;
+
       await prisma.menus.create({
         data: {
           CategoryId: Number(categoryId),
@@ -51,12 +53,13 @@ router.post(
           image,
           price,
           order: Number(orderIncreased),
+          author,
         },
       });
 
       return res.status(200).json({ message: '메뉴를 등록하였습니다.' });
     } catch (error) {
-      return res.status(400).json({ error: error.message });
+      next(error);
     }
   },
 );
@@ -78,6 +81,7 @@ router.get('/categories/:categoryId/menus', async (req, res, next) => {
         price: true,
         order: true,
         status: true,
+        author: true,
       },
       where: {
         CategoryId: Number(categoryId),
@@ -95,7 +99,7 @@ router.get('/categories/:categoryId/menus', async (req, res, next) => {
 
     return res.status(200).json({ data: menu });
   } catch (error) {
-    return res.status(400).json({ error: error.message });
+    next(error);
   }
 });
 
@@ -126,6 +130,7 @@ router.get('/categories/:categoryId/menus/:menuId', async (req, res, next) => {
         order: true,
         status: true,
         deletedAt: true,
+        author: true,
       },
     });
 
@@ -137,7 +142,7 @@ router.get('/categories/:categoryId/menus/:menuId', async (req, res, next) => {
 
     return res.status(200).json({ data: menu });
   } catch (error) {
-    return res.status(400).json({ error: error.message });
+    next(error);
   }
 });
 
@@ -150,13 +155,9 @@ router.patch(
       const validation = await createMenus.validateAsync(req.body);
       const { name, description, price, order, status } = validation;
       const { categoryId, menuId } = req.params;
-      const { userId } = req.user;
+      const { userId, type } = req.user;
 
-      const user = await prisma.Users.findFirst({
-        where: { userId: Number(userId) },
-      });
-
-      if (user.type !== 'OWNER') {
+      if (type !== 'OWNER') {
         return res
           .status(400)
           .json({ message: '사장님만 사용할 수 있는 API입니다.' });
@@ -181,6 +182,10 @@ router.patch(
         return res.status(400).json({ error: '존재하지 않은 카테고리입니다.' });
       } else if (!menu) {
         return res.status(400).json({ error: '존재하지 않은 메뉴입니다.' });
+      }
+
+      if (menu.UserId !== userId) {
+        return res.status(401).json({ message: '수정 권한이 없습니다' });
       }
 
       const currentMenu = await prisma.menus.findFirst({
@@ -204,6 +209,7 @@ router.patch(
 
       return res.status(200).json({ message: '메뉴를 수정하였습니다.' });
     } catch (error) {
+      console.log(error);
       return res.status(400).json({ error: error.message });
     }
   },
@@ -216,19 +222,14 @@ router.delete(
   async (req, res, next) => {
     try {
       const { categoryId, menuId } = req.params;
-      const { userId } = req.user;
+      const { userId, type } = req.user;
 
-      const user = await prisma.Users.findFirst({
-        where: { userId: Number(userId) },
-      });
-
-      if (user.type !== 'OWNER') {
+      if (type !== 'OWNER') {
         return res
           .status(400)
           .json({ message: '사장님만 사용할 수 있는 API입니다.' });
       }
 
-      //경로매개변수 오기재시 잡아주기 위함.
       const category = await prisma.categories.findFirst({
         where: { categoryId: Number(categoryId), deletedAt: null },
       });
@@ -250,6 +251,10 @@ router.delete(
         return res.status(400).json({ error: '존재하지 않은 메뉴입니다.' });
       }
 
+      if (menu.UserId !== userId) {
+        return res.status(401).json({ message: '수정 권한이 없습니다' });
+      }
+
       await prisma.menus.update({
         where: { CategoryId: Number(categoryId), menuId: Number(menuId) },
         data: { deletedAt: new Date() },
@@ -257,7 +262,7 @@ router.delete(
 
       return res.status(200).json({ message: '메뉴를 삭제하였습니다.' });
     } catch (error) {
-      return res.status(400).json({ error: error.message });
+      next(error);
     }
   },
 );
