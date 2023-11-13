@@ -39,7 +39,7 @@ router.post('/categories', authMiddleware, async (req, res, next) => {
     });
     return res.status(200).json({ message: '카테고리를 등록하였습니다.' });
   } catch (error) {
-    next(error);
+    // next(error);
   }
 });
 
@@ -161,13 +161,14 @@ router.delete(
         where: { categoryId: Number(categoryId) },
         data: {
           deletedAt: new Date(),
-        },
-      });
-
-      await prisma.menus.updateMany({
-        where: { CategoryId: Number(categoryId) },
-        data: {
-          deletedAt: new Date(),
+          Menus: {
+            updateMany: {
+              where: { CategoryId: Number(categoryId) },
+              data: {
+                deletedAt: new Date(),
+              },
+            },
+          },
         },
       });
 

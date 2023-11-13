@@ -90,7 +90,10 @@ const createCategories = joi.object({
 
 const createOrders = joi.object({
   menuId: joi.number(),
-  quantity: joi.number(),
+  quantity: joi.number().messages({
+    'string.base': 'quantity 숫자만 입력해주세요.',
+    'string.empty': 'quantity 적어주세요.',
+  }),
   status: joi.string().valid('PENDING', 'ACCEPTED', 'CANCEL').messages({
     'any.only':
       '주문대기: PENDING, 접수완료: ACCEPTED, 주문취소: CANCEL 입니다. 세가지 중 하나만 적어주세요',
