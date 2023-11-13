@@ -8,7 +8,7 @@ import ErrorHandlingMiddleware from './middlewares/error-handling.middleware.js'
 import OrdersRouter from './routes/orders.router.js';
 
 const app = express();
-const PORT = 3333;
+const PORT = 3334;
 
 app.use(logMiddleware);
 app.use(express.json());
