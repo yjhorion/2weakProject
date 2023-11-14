@@ -2,6 +2,7 @@ import express from 'express';
 import { prisma } from '../utils/prisma/index.js';
 import authMiddleware from '../middlewares/auth.middleware.js';
 import { createMenus } from '../middlewares/joi.error.definition.js';
+import { checkType } from './categories.router.js';
 
 const router = express.Router();
 
@@ -16,7 +17,7 @@ router.post(
       const { categoryId } = req.params;
       const { userId, type } = req.user;
 
-      if (type !== 'OWNER') {
+      if (type !== checkType.OWNER) {
         return res
           .status(400)
           .json({ message: '사장님만 사용할 수 있는 API입니다.' });
@@ -157,7 +158,7 @@ router.patch(
       const { categoryId, menuId } = req.params;
       const { userId, type } = req.user;
 
-      if (type !== 'OWNER') {
+      if (type !== checkType.OWNER) {
         return res
           .status(400)
           .json({ message: '사장님만 사용할 수 있는 API입니다.' });
@@ -224,7 +225,7 @@ router.delete(
       const { categoryId, menuId } = req.params;
       const { userId, type } = req.user;
 
-      if (type !== 'OWNER') {
+      if (type !== checkType.OWNER) {
         return res
           .status(400)
           .json({ message: '사장님만 사용할 수 있는 API입니다.' });

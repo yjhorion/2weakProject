@@ -2,6 +2,7 @@ import express from 'express';
 import { prisma } from '../utils/prisma/index.js';
 import authMiddleware from '../middlewares/auth.middleware.js';
 import { createOrders } from '../middlewares/joi.error.definition.js';
+import { checkType } from './categories.router.js';
 
 const router = express.Router();
 
@@ -12,7 +13,7 @@ router.post('/orders', authMiddleware, async (req, res, next) => {
     const { menuId, quantity } = validation;
     const { userId, type } = req.user;
 
-    if (type !== 'CUSTOMER') {
+    if (type !== createType.CUSTOMER) {
       return res
         .status(400)
         .json({ message: '소비자만 사용할 수 있는 API입니다.' });
@@ -51,7 +52,7 @@ router.get('/orders/customer', authMiddleware, async (req, res, next) => {
   try {
     const { userId, type } = req.user;
 
-    if (type !== 'CUSTOMER') {
+    if (type !== checkType.CUSTOMER) {
       return res
         .status(400)
         .json({ message: '소비자만 사용할 수 있는 API입니다.' });
@@ -89,7 +90,7 @@ router.get('/orders/owner', authMiddleware, async (req, res, next) => {
   try {
     const { type } = req.user;
 
-    if (type !== 'OWNER') {
+    if (type !== checkType.OWNER) {
       return res
         .status(400)
         .json({ message: '사장님만 사용할 수 있는 API입니다.' });
@@ -127,6 +128,13 @@ router.patch(
       const validation = await createOrders.validateAsync(req.body);
       const { orderId } = req.params;
       const { status } = validation;
+      const { type } = req.user;
+
+      if (type !== checkType.OWNER) {
+        return res
+          .status(400)
+          .json({ message: '사장님만 사용할 수 있는 API입니다.' });
+      }
 
       const order = await prisma.orders.findFirst({
         where: { orderId: Number(orderId) },

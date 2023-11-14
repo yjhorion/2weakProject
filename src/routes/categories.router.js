@@ -5,6 +5,9 @@ import { createCategories } from '../middlewares/joi.error.definition.js';
 
 const router = express.Router();
 
+const checkType = { OWNER: 'OWNER', CUSTOMER: 'CUSTOMER' };
+export { checkType };
+
 /** 카테고리 등록 **/
 router.post('/categories', authMiddleware, async (req, res, next) => {
   try {
@@ -12,7 +15,7 @@ router.post('/categories', authMiddleware, async (req, res, next) => {
     const { name } = validation;
     const { userId, type } = req.user;
 
-    if (type !== 'OWNER') {
+    if (type !== checkType.OWNER) {
       return res
         .status(400)
         .json({ message: '사장님만 사용할 수 있는 API입니다.' });
