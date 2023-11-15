@@ -52,7 +52,7 @@ model Menus {
   deletedAt   DateTime? @map("deletedAt")
 
   Orders   Orders[]
-  Category Categories   @relation(fields: [CategoryId], references: [categoryId], onUpdate: Cascade)
+  Category Categories   @relation(fields: [CategoryId], references: [categoryId])
   User     Users        @relation(fields: [UserId], references: [userId])
 
   @@map("Menus")
@@ -67,8 +67,8 @@ model Orders {
   totalPrice Int       @map("totalPrice")
   orderedAt  DateTime  @map("orderedAt")
 
-  User Users @relation(fields:[UserId], references:[userId], onUpdate: Cascade)
-  Menu Menus @relation(fields:[MenuId], references:[menuId], onUpdate: Cascade)
+  User Users @relation(fields:[UserId], references:[userId])
+  Menu Menus @relation(fields:[MenuId], references:[menuId])
 
   @@map("Orders")
 }
