@@ -42,7 +42,7 @@ router.post('/categories', authMiddleware, async (req, res, next) => {
     });
     return res.status(200).json({ message: '카테고리를 등록하였습니다.' });
   } catch (error) {
-    // next(error);
+    next(error);
   }
 });
 
@@ -81,7 +81,7 @@ router.patch(
       const { categoryId } = req.params;
       const { userId, type } = req.user;
 
-      if (type !== 'OWNER') {
+      if (type !== checkType.OWNER) {
         return res
           .status(400)
           .json({ message: '사장님만 사용할 수 있는 API입니다.' });
@@ -117,7 +117,6 @@ router.patch(
       await prisma.Categories.update({
         where: {
           categoryId: Number(categoryId),
-          deletedAt: null,
         },
         data: { name, order },
       });
@@ -140,7 +139,7 @@ router.delete(
       const { categoryId } = req.params;
       const { userId, type } = req.user;
 
-      if (type !== 'OWNER') {
+      if (type !== checkType.OWNER) {
         return res
           .status(400)
           .json({ message: '사장님만 사용할 수 있는 API입니다.' });
@@ -157,7 +156,7 @@ router.delete(
       }
 
       if (category.UserId !== userId) {
-        return res.status(401).json({ message: '수정 권한이 없습니다' });
+        return res.status(401).json({ message: '삭제 권한이 없습니다' });
       }
 
       await prisma.Categories.update({

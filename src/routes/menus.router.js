@@ -53,7 +53,7 @@ router.post(
           description,
           image,
           price,
-          order: Number(orderIncreased),
+          order: orderIncreased,
           author,
         },
       });
@@ -75,6 +75,12 @@ router.get('/categories/:categoryId/menus', async (req, res, next) => {
     });
 
     const menu = await prisma.menus.findMany({
+      where: {
+        CategoryId: Number(categoryId),
+        deletedAt: null,
+        Category: { deletedAt: null },
+      },
+      orderBy: { order: 'asc' },
       select: {
         menuId: true,
         name: true,
@@ -84,12 +90,6 @@ router.get('/categories/:categoryId/menus', async (req, res, next) => {
         status: true,
         author: true,
       },
-      where: {
-        CategoryId: Number(categoryId),
-        deletedAt: null,
-        Category: { deletedAt: null },
-      },
-      orderBy: { order: 'asc' },
     });
 
     if (!category) {
@@ -117,10 +117,10 @@ router.get('/categories/:categoryId/menus/:menuId', async (req, res, next) => {
       where: {
         CategoryId: Number(categoryId),
         menuId: Number(menuId),
+        deletedAt: null,
         Category: {
           deletedAt: null,
         },
-        deletedAt: null,
       },
       select: {
         CategoryId: true,
@@ -172,10 +172,10 @@ router.patch(
         where: {
           CategoryId: Number(categoryId),
           menuId: Number(menuId),
+          deletedAt: null,
           Category: {
             deletedAt: null,
           },
-          deletedAt: null,
         },
       });
 
@@ -204,8 +204,8 @@ router.patch(
       }
 
       await prisma.menus.update({
-        data: { name, description, price, order, status },
         where: { CategoryId: Number(categoryId), menuId: Number(menuId) },
+        data: { name, description, price, order, status },
       });
 
       return res.status(200).json({ message: '메뉴를 수정하였습니다.' });
@@ -239,10 +239,10 @@ router.delete(
         where: {
           CategoryId: Number(categoryId),
           menuId: Number(menuId),
+          deletedAt: null,
           Category: {
             deletedAt: null,
           },
-          deletedAt: null,
         },
       });
 
@@ -253,7 +253,7 @@ router.delete(
       }
 
       if (menu.UserId !== userId) {
-        return res.status(401).json({ message: '수정 권한이 없습니다' });
+        return res.status(401).json({ message: '삭제 권한이 없습니다' });
       }
 
       await prisma.menus.update({

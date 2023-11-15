@@ -13,7 +13,7 @@ router.post('/orders', authMiddleware, async (req, res, next) => {
     const { menuId, quantity } = validation;
     const { userId, type } = req.user;
 
-    if (type !== createType.CUSTOMER) {
+    if (type !== checkType.CUSTOMER) {
       return res
         .status(400)
         .json({ message: '소비자만 사용할 수 있는 API입니다.' });
@@ -36,13 +36,13 @@ router.post('/orders', authMiddleware, async (req, res, next) => {
           },
         },
         quantity,
-        totalPrice: Number(totalPrice),
         orderedAt: new Date(),
         totalPrice: totalPrice[0].totalPrice,
       },
     });
     return res.status(200).json({ message: '메뉴 주문이 완료되었습니다.' });
   } catch (error) {
+    console.log(error);
     next(error);
   }
 });
@@ -126,8 +126,8 @@ router.patch(
   async (req, res, next) => {
     try {
       const validation = await createOrders.validateAsync(req.body);
-      const { orderId } = req.params;
       const { status } = validation;
+      const { orderId } = req.params;
       const { type } = req.user;
 
       if (type !== checkType.OWNER) {
