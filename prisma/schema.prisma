@@ -12,44 +12,37 @@ datasource db {
 
 model Users {
   userId    Int       @id @default(autoincrement()) @map("userId")
-  nickname  String    @map("nickname")
+  username  String    @map("userName")
   password  String    @map("password")
-  type      String    @default("CUSTOMER") @map("type")
+  credit    Int       @default(300000) @map("credit")
   
-  Categories Categories[]
-  Menus      Menus[]
+  Reservation Reservation[]
 
   @@map("Users")
 }
 
-model Categories {
-  categoryId Int       @id @default(autoincrement()) @map("categoryId")
-  UserId     Int       @map("UserId")
-  name       String    @map("name")
-  order      Int       @map("order")
-  deletedAt  DateTime? @map("deletedAt")
+model Shows {
+  showId    Int      @id @default(autoincrement()) @map("showId")
+  showName  String   @map("showName")
+  postUrl   String   @map("postUrl")
+  price     Int      @map("price")
+  location  String   @map("location")
+  date      DateTime @map("date")
+  quantity  Int      @map("quantity")
 
-  Menus Menus[]       
-  User  Users         @relation(fields: [UserId], references: [userId])
+  Reservation Reservation[]
 
-  @@map("Categories")
+  @@map("Shows")
 }
 
-model Menus {
-  menuId      Int       @id @default(autoincrement()) @map("menuId")
-  CategoryId  Int       @map("CategoryId")
-  UserId      Int       @map("UserId")
-  name        String    @map("name")
-  order       Int       @map("order")
-  description String    @map("description")
-  image       String    @map("image")
-  price       Int       @map("price")
-  status      String    @default("FOR_SALE") @map("status")
-  deletedAt   DateTime? @map("deletedAt")
+model Reservation {
+  reservationId Int   @id @default(autoincrement()) @map("reservationId")
+  UserId        Int   @map("UserId")
+  ShowId        Int   @map("ShowId")
+   
+  Show  Shows         @relation(fields: [ShowId], references: [showId], onDelete:Cascade)
+  User  Users         @relation(fields: [UserId], references: [userId], onDelete:Cascade)
 
-  Category Categories   @relation(fields: [CategoryId], references: [categoryId], onUpdate: Cascade)
-  User     Users        @relation(fields: [UserId], references: [userId])
-
-  @@map("Menus")
+  @@map("Reservation")
 }
 

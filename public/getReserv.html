@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <title>공연 상세 조회</title>
+    <style>
+      .header {
+        padding: 10px;
+      }
+
+      .logo {
+        display: flex;
+        align-items: center;
+      }
+
+      .logo,
+      .navigation {
+        margin-right: auto;
+        margin-left: auto;
+      }
+
+      #container {
+        display: flex;
+        align-items: center;
+        width: 80%;
+        max-width: 800px;
+        border: 1px solid #ccc;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .poster {
+        margin-left: 200px;
+        width: 400px;
+      }
+      #details {
+        flex: 2;
+      }
+
+      .content {
+        background-color: #fafaf5;
+        outline: solid 1px rgba(0, 0, 0, 0.175);
+        width: 500px;
+        height: 533px;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-around;
+        align-items: center;
+        align-content: center;
+        flex-wrap: wrap;
+        font-size: x-large;
+      }
+
+      #reserveButton {
+        background-color: #198754;
+        color: #fff;
+        padding: 10px;
+        border: none;
+        cursor: pointer;
+        width: 400px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <header class="header">
+      <div class="container">
+        <div class="row">
+          <div class="col-12 col-md-6 logo">
+            <a href="/">
+              <img
+                src="./images/logo.jpg"
+                alt="Logo"
+                style="height: 100px; width: auto"
+              />
+            </a>
+          </div>
+          <div class="col-12 col-md-6 navigation text-end mt-4">
+            <a href="/getReservDetail.html" class="btn btn-link">예매조회</a>
+            <a href="/signin.html" class="btn btn-success ms-3">로그인</a>
+            <a href="/signup.html" class="btn btn-success ms-3">회원가입</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="container mt-5">
+      <div class="row">
+        <div class="col-md-6">
+          <img src="" alt="Show Poster" class="poster img-fluid rounded-4" />
+        </div>
+        <div class="content col-md-6 fw-bold rounded-4">
+          <div class="card1">
+            <p class="mb-2 mb-5" id="showName">공연명</p>
+            <p class="mb-2 mb-5" id="location">공연장소</p>
+            <p class="mb-2 mb-5" id="date">공연일시</p>
+            <p class="mb-2 mb-5" id="quantity">남은좌석</p>
+            <p class="mb-4 mb-5" id="price">티켓가격</p>
+          </div>
+
+          <!-- 예매하기 버튼 -->
+          <button id="reserveButton" class="btn mt-4" onclick="reserveShow()">
+            예매하기
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+    <script>
+      let showInfo;
+      // 서버로부터 공연 데이터를 받아와서 화면에 표시하는 함수
+      function displayShows(showData) {
+        document.getElementById(
+          'showName',
+        ).innerText = `공연명:     ${showData.showName}`;
+        document.getElementById(
+          'location',
+        ).innerText = `공연장소:    ${showData.location}`;
+        document.getElementById(
+          'date',
+        ).innerText = `공연일시:      ${showData.date}`;
+        document.getElementById(
+          'quantity',
+        ).innerText = `남은좌석:     ${showData.quantity}`;
+        document.getElementById(
+          'price',
+        ).innerText = `공연가격:     ${showData.price}`;
+
+        const posterImage = document.querySelector('.poster');
+        posterImage.src = showData.postUrl;
+        posterImage.alt = 'Show Poster';
+      }
+
+      //showId를 추출하는함수
+      function geShowIdFromURL() {
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        return urlParams.get('showId');
+      }
+
+      // userId를 추출하는 함수
+      function getUserInfo() {
+        fetch('/api/sign-in', {
+        method: 'GET',
+        credentials: 'include', 
+        })
+        .then((response) => response.json())
+        .then((data) => {
+          consol.log(data)
+          document.getElementById('username').innerText = `안녕하세요, ${data.username}님`;
+        })
+        .catch((error) => {
+        console.error('사용자 정보를 가져오는 중 에러 발생:', error); //여기가 항상 발생.
+    });
+}
+
+      //공연 상세정보를 가져오는 함수
+      function getShowDetail() {
+        const showId = geShowIdFromURL();
+        fetch(`/api/reservation/${showId}`)
+          .then((res) => res.json())
+          .then((data) => {
+            displayShows(data.data);
+            showInfo = data.data;
+          })
+          .catch((error) => {
+            console.error('에러 발생:', error);
+          });
+      }
+      // 페이지 로딩 시 공연 상세 정보를 가져오도록 호출
+      getShowDetail();
+
+      //예매하기 함수
+      function reserveShow() {
+        const showId = geShowIdFromURL();
+        const userId = getUserInfo();
+
+        const reservationData = {
+          userId: userId,
+          showId: showId,
+        };
+
+        // POST 요청을 보냅니다.
+        fetch(`/api/reservation/${showId}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(reservationData),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log(data);
+            alert(data.message, "getReserv.html에서 발생");
+            window.location.href = '/';
+          })
+          .catch((error) => {
+            console.error('에러 발생:', error);
+          });
+      }
+    </script>
+  </body>
+</html>
