@@ -14,7 +14,6 @@
     "jsonwebtoken": "^9.0.2",
     "prettier": "^3.0.3",
     "prisma": "^5.5.2",
-    "start": "^5.1.0",
     "winston": "^3.11.0"
   },
   "devDependencies": {

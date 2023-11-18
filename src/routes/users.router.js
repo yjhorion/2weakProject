@@ -11,7 +11,7 @@ import authMiddleware from '../middlewares/auth.middleware.js';
 const router = express.Router();
 
 /** 회원가입 API **/
-router.post('/sign-up', async (req, res, next) => {
+router.post('/sign-up', async (req, res, next, next) => {
   try {
     const validation = await createSignUp.validateAsync(req.body);
     const { username, password } = validation;
@@ -67,7 +67,6 @@ router.post('/sign-in', async (req, res, next) => {
     res.cookie('authorization', `Bearer ${token}`);
     return res.status(200).json({ message: '로그인 성공' });
   } catch (error) {
-    console.log(error);
     next(error);
   }
 });
