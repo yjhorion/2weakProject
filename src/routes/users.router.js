@@ -11,7 +11,7 @@ import authMiddleware from '../middlewares/auth.middleware.js';
 const router = express.Router();
 
 /** 회원가입 API **/
-router.post('/sign-up', async (req, res, next, next) => {
+router.post('/sign-up', async (req, res, next) => {
   try {
     const validation = await createSignUp.validateAsync(req.body);
     const { username, password } = validation;
