@@ -16,7 +16,7 @@ jobs:
     - name: Setup SSH
       run: |
         mkdir -p ~/.ssh/
-        echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa # SSH 개인 키 추가
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa # SSH 개인 키 추가
         chmod 600 ~/.ssh/id_rsa
         ssh-keyscan -H 172.31.39.226 >> ~/.ssh/known_hosts # EC2 호스트 추가
 
