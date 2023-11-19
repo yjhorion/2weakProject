@@ -22,7 +22,7 @@ jobs:
 
       - name: SSH to EC2 and perform actions
         run: |
-          ssh -i ~/.ssh/id_rsa ec2-user@13.125.163.109 '
+          ssh -i ~/.ssh/id_rsa ubuntu@13.125.163.109 '
             sudo systemctl stop your_service_name &&
             cd /path/to/your/app &&
             git clone https://github.com/yjhorion/2weekProject &&
