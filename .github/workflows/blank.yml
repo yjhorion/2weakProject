@@ -25,7 +25,7 @@ jobs:
           ssh -i ~/.ssh/id_rsa ubuntu@13.125.163.109 '
             # sudo systemctl stop your_service_name &&
             git clone https://github.com/yjhorion/2weekProject &&
-            cd /nodelevel3 &&
+            cd /2weekProject &&
             echo "DATABASE_URL=\"mysql://root:aaaa4321@express-database2.cxfgfhcxjpfl.ap-northeast-2.rds.amazonaws.com:3306/level3\"" >> .env &&
             curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash - &&
             sudo apt-get install -y nodejs &&
