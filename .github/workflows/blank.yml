@@ -18,7 +18,7 @@ jobs:
         mkdir -p ~/.ssh/
         echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa # SSH 개인 키 추가
         chmod 400 ~/.ssh/id_rsa
-        ssh-keyscan -H 172.31.39.226 >> ~/.ssh/known_hosts # EC2 호스트 추가
+        ssh-keyscan -H 13.125.163.109 >> ~/.ssh/known_hosts # EC2 호스트 추가
 
     - name: SSH to EC2 and perform actions
       run: |
