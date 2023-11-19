@@ -10,27 +10,28 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-    - name: Setup SSH
-      run: |
-        mkdir -p ~/.ssh/
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa # SSH 개인 키 추가
-        chmod 400 ~/.ssh/id_rsa
-        ssh-keyscan -H 13.125.163.109 >> ~/.ssh/known_hosts # EC2 호스트 추가
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh/
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa # SSH 개인 키 추가
+          chmod 400 ~/.ssh/id_rsa
+          ssh-keyscan -H 13.125.163.109 >> ~/.ssh/known_hosts # EC2 호스트 추가
 
-    - name: SSH to EC2 and perform actions
-      run: |
-        ssh -i ~/.ssh/id_rsa ec2-user@$EC2_HOST '
-          sudo systemctl stop your_service_name &&
-          cd /path/to/your/app &&
-          git clone https://github.com/yjhorion/2weekProject &&
-          echo "DATABASE_URL=\"mysql://root:aaaa4321@express-database2.cxfgfhcxjpfl.ap-northeast-2.rds.amazonaws.com:3306/level3\"" >> .env &&
-          curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash - &&
-          sudo apt-get install -y nodejs &&
-          npm install -g yarn &&
-          yarn &&
-          npm install -g pm2 &&
-          pm2 start your_app.js &&
-          sudo systemctl start your_service_name
+      - name: SSH to EC2 and perform actions
+        run: |
+          ssh -i ~/.ssh/id_rsa ec2-user@$EC2_HOST '
+            sudo systemctl stop your_service_name &&
+            cd /path/to/your/app &&
+            git clone https://github.com/yjhorion/2weekProject &&
+            echo "DATABASE_URL=\"mysql://root:aaaa4321@express-database2.cxfgfhcxjpfl.ap-northeast-2.rds.amazonaws.com:3306/level3\"" >> .env &&
+            curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash - &&
+            sudo apt-get install -y nodejs &&
+            npm install -g yarn &&
+            yarn &&
+            npm install -g pm2 &&
+            pm2 start your_app.js &&
+            sudo systemctl start your_service_name
+          '
