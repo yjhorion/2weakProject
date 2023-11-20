@@ -119,39 +119,6 @@
 
     <script>
       // 시간이 된다면 로그아웃 구현
-      // function signout() {
-      //   // 로그아웃 로직을 여기에 추가 (예시: 간단히 로그아웃 메시지만 보여줌)
-
-      //   // Fetch API를 이용하여 서버로 데이터 전송
-      //   fetch('/api/sign-out', {
-      //     method: 'POST',
-      //     headers: {
-      //       'Content-Type': 'application/json',
-      //     },
-      //     credentials: 'include', // 쿠키를 서버에 전송하기 위해 credentials를 include로 설정
-      //   })
-      //     .then((res) => res.json())
-      //     .then((data) => {
-      //       // 서버로부터 받은 응답에 따라 처리할 로직 작성
-      //       console.log(data); // 예시로 받은 응답을 콘솔에 출력
-
-      //       if (data.message === '로그아웃 성공') {
-      //         showSuccessToast(); // 로그아웃 성공 토스트 메시지 표시
-      //       }
-      //     })
-      //     .catch((error) => {
-      //       console.error('에러 발생:', error);
-      //     });
-
-      //   // 로그아웃 버튼 숨기고 로그인 버튼 보이기
-      //   document.getElementById('signinButton').classList.add('d-none');
-      //   document.getElementById('signoutButton').classList.remove('d-none');
-      // }
-
-      // // 예시로 간단한 토스트 메시지를 표시하는 함수
-      // function showSuccessToast() {
-      //   alert('로그아웃이 성공적으로 처리되었습니다.');
-      // }
       // API를 호출하여 로그인 상태를 확인하고 버튼을 동적으로 변경하는 함수
       function checkLoginStatus() {
         // 서버로 GET 요청 보내서 로그인 상태를 확인합니다.
@@ -188,26 +155,6 @@
 
       // 페이지 로딩 시 로그인 상태를 확인하고 버튼 상태를 변경하는 함수를 호출합니다.
       checkLoginStatus();
-
-      // // 이미지 URL을 가져오고 이미지 태그에 설정하는 함수
-      // function loadShowImage() {
-      //   // 서버에서 이미지 URL을 가져오는 API 엔드포인트 호출
-      //   fetch('/api//reservation')
-      //     .then((res) => res.json())
-      //     .then((data) => {
-      //       console.log(data[0]);
-      //       const postUrl = data.postUrl;
-
-      //       // 이미지 태그에 URL 설정
-      //       document.getElementById('poster').src = postUrl;
-      //     })
-      //     .catch((error) => {
-      //       console.error('에러 발생:', error);
-      //     });
-      // }
-
-      // // 예시: showId가 1인 이미지를 가져오는 함수 호출
-      // loadShowImage();
     </script>
   </body>
 </html>

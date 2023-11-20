@@ -10,7 +10,6 @@ const createSignUp = joi.object({
     'string.min': 'password를 8글자 이상으로 작성해주세요.',
     'string.max': 'password를 20글자 이하으로 작성해주세요.',
     'string.empty': 'password를 입력해주세요.',
-    'any.custom': '비번이랑 닉넴이랑 안맞아요',
     'any.invalid': 'password에 nickname이 포함되면 안됩니다.',
   }),
 });

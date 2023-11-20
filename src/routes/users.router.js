@@ -19,7 +19,7 @@ router.post('/sign-up', async (req, res, next) => {
     if (password.includes(username)) {
       return res
         .status(400)
-        .json({ mesaage: 'password에 username이 포함되면 안됩니다.' });
+        .json({ message: 'password에 username이 포함되면 안됩니다.' });
     }
 
     const isExistUsername = await prisma.users.findFirst({
@@ -90,6 +90,10 @@ router.get('/user', authMiddleware, async (req, res, next) => {
     where: { userId },
     select: { username: true, credit: true },
   });
+
+  if (!user) {
+    return res.status(400).json({ message: '사용자 정보가 없습니다.' });
+  }
   return res.status(200).json({ data: user });
 });
 

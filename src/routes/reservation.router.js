@@ -8,6 +8,10 @@ const router = express.Router();
 router.get('/reservation', async (req, res, next) => {
   try {
     const reservation = await prisma.shows.findMany();
+
+    if (!reservation) {
+      return res.status(400).json({ message: '공연이 존재하지않습니다.' });
+    }
     return res.status(200).json({ data: reservation });
   } catch (error) {
     console.log(error);
@@ -36,41 +40,53 @@ router.get('/reservation/:showId', async (req, res, next) => {
 
 /** 공연 예매 내역 조회 **/
 router.get(
-  '/reservation/detail/:showId',
+  '/reservation/detail/user',
   authMiddleware,
   async (req, res, next) => {
     try {
       const { userId } = req.user;
-      // const { showId } = req.params;
 
-      const reservation = await prisma.reservation.findFirst({
+      const reservations = await prisma.reservation.findMany({
         where: { UserId: +userId },
       });
 
-      //me가 showId로 들어가는 바람에 오류가 난 상황.
-      //경로를 바꿔야한다.
-      if (!reservation) {
+      console.log('유저의 예매내역', reservations);
+      if (reservations.length === 0) {
         return res
           .status(400)
           .json({ message: '해당 유저의 예매 정보가 없습니다.' });
       }
 
-      const show = await prisma.Shows.findFirst({
-        where: { showId: +reservation.ShowId },
-        select: {
-          showName: true,
-          date: true,
-          location: true,
-        },
-      });
+      // const shows = await prisma.Shows.findMany({
+      //   where: { showId: +reservations.ShowId },
+      //   select: {
+      //     showName: true,
+      //     date: true,
+      //     location: true,
+      //   },
+      // });
+      //여러 예매 내역 조회
+      const shows = await Promise.all(
+        reservations.map(async (reservation) => {
+          const show = await prisma.Shows.findFirst({
+            where: { showId: reservation.ShowId },
+            select: {
+              showName: true,
+              date: true,
+              location: true,
+            },
+          });
+          return show;
+        }),
+      );
 
-      if (!show) {
+      if (!shows) {
         return res
           .status(400)
           .json({ message: '해당 유저의 예매 정보가 없습니다.' });
       }
 
-      return res.status(200).json({ data: show });
+      return res.status(200).json({ data: shows });
     } catch (error) {
       next(error);
     }

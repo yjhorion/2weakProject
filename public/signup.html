@@ -116,12 +116,10 @@
         .then((data) => {
         if (data.message === '회원가입 성공') {
             alert(data.message)
-            console.log(data.message);
             window.location.href = '/';
-        }
-        alert(data.message)  
-        console.log(data.message);
-          
+        } else {
+          alert(data.message)  
+        }          
         })
         .catch((error) => {
           alert(error)
