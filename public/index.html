@@ -1,0 +1,160 @@
+<!-- /src/public/index.html -->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <title>메인 화면</title>
+    <style>
+      /* body {
+        background: linear-gradient(to right, #93c2ac, #fafaf5, #93c2ac);
+      } */
+      .header {
+        padding: 10px;
+      }
+
+      .logo {
+        display: flex;
+        align-items: center;
+      }
+
+      .logo,
+      .navigation {
+        margin-right: auto;
+        margin-left: auto;
+      }
+
+      .card {
+        width: 1500px;
+        height: 250px;
+        margin-top: 100px;
+        overflow: hidden;
+      }
+
+      .card-img {
+        width: 100v;
+        height: 800px;
+        position: relative;
+        overflow: hidden;
+        top: -200px;
+      }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </head>
+
+  <body>
+    <header class="header">
+      <div class="container">
+        <div class="row">
+          <div class="col-12 col-md-6 logo">
+            <a href="/">
+              <img
+                src="./images/logo.jpg"
+                alt="Logo"
+                style="height: 100px; width: auto"
+              />
+            </a>
+          </div>
+          <div class="col-12 col-md-6 navigation text-end mt-4">
+            <a href="/getReservDetail.html" class="btn btn-link">예매조회</a>
+            <a
+              href="/signin.html"
+              id="signinButton"
+              class="btn btn-success ms-3"
+              onclick="login()"
+              >로그인</a
+            >
+            <a
+              href="/signin.html"
+              id="signoutButton"
+              class="btn btn-success ms-3 d-none"
+              onclick="logout()"
+              >로그아웃</a
+            >
+            <a href="/signup.html" class="btn btn-success ms-3">회원가입</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- 공연 3개 -->
+    <main>
+      <div class="cards">
+        <div class="card text-bg-dark mx-auto w-75 rounded-4">
+          <a href="/getReserv.html?showId=1">
+            <img
+              src="./images/show1.gif"
+              class="card-img"
+              alt="..."
+              id="poster"
+            />
+            <div class="card-img-overlay">
+              <h5 class="card-title">오페라의 유령</h5>
+            </div>
+          </a>
+        </div>
+        <div class="card text-bg-dark mx-auto mt-5 w-75 rounded-4">
+          <a href="/getReserv.html?showId=2">
+            <img src="./images/show2.gif" class="card-img" alt="..." />
+            <div class="card-img-overlay">
+              <h5 class="card-title">일 테노레</h5>
+            </div>
+          </a>
+        </div>
+        <div class="card text-bg-dark mx-auto mt-5 w-75 rounded-4">
+          <a href="/getReserv.html?showId=3">
+            <img src="./images/show3.gif" class="card-img" alt="..." />
+            <div class="card-img-overlay">
+              <h5 class="card-title">레 미제라블</h5>
+            </div>
+          </a>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      // 시간이 된다면 로그아웃 구현
+      // API를 호출하여 로그인 상태를 확인하고 버튼을 동적으로 변경하는 함수
+      function checkLoginStatus() {
+        // 서버로 GET 요청 보내서 로그인 상태를 확인합니다.
+        fetch('/api/user')
+          .then((response) => {
+            if (response.ok) {
+              return response.json();
+            } else {
+              // 비로그인 상태일 때, "로그아웃" 버튼을 숨기고 "로그인" 버튼을 보여줍니다.
+              document.getElementById('signoutButton').classList.add('d-none');
+              document
+                .getElementById('signinButton')
+                .classList.remove('d-none');
+            }
+          })
+          .then((data) => {
+            console.log(data); //아래 alert를 해결하고싶다...
+            // alert(`어서오세요. ${data.username}님`);
+            if (!!data == true) {
+              // 로그인 상태일 때, "로그인" 버튼을 숨기고 "로그아웃" 버튼을 보여줍니다.
+              document.getElementById('signoutButton').classList.add('d-none');
+              document
+                .getElementById('signinButton')
+                .classList.remove('d-none');
+            }
+          })
+          .catch((error) => {
+            console.error('에러 발생:', error);
+            // 비로그인 상태일 때, "로그아웃" 버튼을 숨기고 "로그인" 버튼을 보여줍니다.
+            document.getElementById('signoutButton').classList.add('d-none');
+            document.getElementById('signinButton').classList.remove('d-none');
+          });
+      }
+
+      // 페이지 로딩 시 로그인 상태를 확인하고 버튼 상태를 변경하는 함수를 호출합니다.
+      checkLoginStatus();
+    </script>
+  </body>
+</html>
