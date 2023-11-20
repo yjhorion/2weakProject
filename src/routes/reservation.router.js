@@ -4,7 +4,7 @@ import authMiddleware from '../middlewares/auth.middleware.js';
 
 const router = express.Router();
 
-/** (메인) 공연 목록 조회**/
+/** (메인) 공연 목록 조회 **/
 router.get('/reservation', async (req, res, next) => {
   try {
     const reservation = await prisma.shows.findMany();
