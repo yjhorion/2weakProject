@@ -3,7 +3,15 @@ import { prisma } from '../utils/prisma/index.js';
 
 export default async function (req, res, next) {
   try {
-    const { authorization } = req.cookies;
+    let authorization = ""
+    if (req.headers.authorization) {
+      authorization  = req.headers.authorization
+    } else if ( req.cookies.authorization) {
+      authorization  = req.cookies.authorization;
+    }
+
+    console.log("auth jwt token :", authorization)
+
     if (!authorization) throw new Error('토큰이 존재하지않습니다.');
 
     const [tokenType, token] = authorization.split(' ');
@@ -24,6 +32,7 @@ export default async function (req, res, next) {
     req.user = user;
     next();
   } catch (error) {
+    console.log(error)
     res.clearCookie('authorization');
     switch (error.name) {
       case 'JsonWebTokenError':

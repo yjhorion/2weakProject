@@ -60,9 +60,9 @@ router.post('/sign-in', async (req, res, next) => {
       return res.status(400).json({ message: 'password를 확인해주세요.' });
     }
 
-    const token = jwt.sign({ userId: user.userId }, 'secretKey', {
-      expiresIn: '1000s',
-    });
+    const token = jwt.sign({ userId: user.userId }, 'secretKey' 
+      // expiresIn: '1000y',
+    );
 
     res.cookie('authorization', `Bearer ${token}`);
     return res.status(200).json({ message: '로그인 성공' });

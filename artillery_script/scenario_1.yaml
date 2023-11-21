@@ -3,11 +3,11 @@ config:
     local:
       target: 'http://localhost:3334'
       phases:
-        - duration: 30
-          arrivalRate: 1
+        - duration: 1
+          arrivalRate: 5
           name: Warm up
       defaults:
-        User-Agent: 'Artiilery'
+        User-Agent: 'Artillery'
       payload:
         path: 'users.csv'
         fields:
@@ -18,13 +18,20 @@ config:
 #     values: [1, 2, 3]
 
 scenarios:
-  - name: '회원가입'
+  - name: '로그인, 예매'
     flow:
+    #   - post:
+    #       url: '/api/sign-in'
+    #       json:
+    #         username: 'YJH'
+    #         password: '12341234'
+
       - post:
-          url: '/api/sign-up'
-          json:
-            username: '{{username}}'
-            password: '{{password}}'
+          url: '/api/reservation/1'
+          headers :
+           authorization : 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE4LCJpYXQiOjE3MDA1NzA5MDksImV4cCI6MTcwMDU3MTkwOX0.R9ycM4k5-JdO3OayP7xpONUvkh-AXamVcbZLs_0q-KI'
+          #  authorization : 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE4LCJpYXQiOjE3MDA1NzA5MDksImV4cCI6MTcwMDU3MTkwOX0.R9ycM4k5-JdO3OayP7xpONUvkh-AXamVcbZLs_0q-KI; Path=/; Domain=localhost' 
+
       # - post:
       #     url: '/api/sign-in'
       #     json:
