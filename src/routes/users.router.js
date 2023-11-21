@@ -16,7 +16,7 @@ router.post('/sign-up', async (req, res, next) => {
     const validation = await createSignUp.validateAsync(req.body);
     const { username, password } = validation;
 
-    if (password.includes(username)) {
+    if (!password || !username || password.includes(username)) {
       return res
         .status(400)
         .json({ message: 'password에 username이 포함되면 안됩니다.' });
@@ -73,28 +73,36 @@ router.post('/sign-in', async (req, res, next) => {
 
 /** 로그아웃 API **/
 router.post('/sign-out', async (req, res, next) => {
-  if (!req.cookies.authorization) {
-    return res.status(400).json({
-      message: '로그아웃 실패하셨습니다.',
-    });
+  try {
+    if (!req.cookies.authorization) {
+      return res.status(400).json({
+        message: '로그아웃 실패하셨습니다.',
+      });
+    }
+    res.clearCookie('authorization');
+    return res.status(200).json({ message: '로그아웃 성공' });
+  } catch (error) {
+    next(error);
   }
-  res.clearCookie('authorization');
-  return res.status(200).json({ message: '로그아웃 성공' });
 });
 
 /** 사용자 조회 API **/
 router.get('/user', authMiddleware, async (req, res, next) => {
-  const { userId } = req.user;
+  try {
+    const { userId } = req.user;
 
-  const user = await prisma.users.findFirst({
-    where: { userId },
-    select: { username: true, credit: true },
-  });
+    const user = await prisma.users.findFirst({
+      where: { userId },
+      select: { username: true, credit: true },
+    });
 
-  if (!user) {
-    return res.status(400).json({ message: '사용자 정보가 없습니다.' });
+    if (!user) {
+      return res.status(400).json({ message: '사용자 정보가 없습니다.' });
+    }
+    return res.status(200).json({ data: user });
+  } catch (error) {
+    next(error);
   }
-  return res.status(200).json({ data: user });
 });
 
 export default router;

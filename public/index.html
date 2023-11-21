@@ -118,43 +118,42 @@
     </main>
 
     <script>
-      // 시간이 된다면 로그아웃 구현
-      // API를 호출하여 로그인 상태를 확인하고 버튼을 동적으로 변경하는 함수
-      function checkLoginStatus() {
-        // 서버로 GET 요청 보내서 로그인 상태를 확인합니다.
-        fetch('/api/user')
-          .then((response) => {
-            if (response.ok) {
-              return response.json();
-            } else {
-              // 비로그인 상태일 때, "로그아웃" 버튼을 숨기고 "로그인" 버튼을 보여줍니다.
-              document.getElementById('signoutButton').classList.add('d-none');
-              document
-                .getElementById('signinButton')
-                .classList.remove('d-none');
-            }
-          })
-          .then((data) => {
-            console.log(data); //아래 alert를 해결하고싶다...
-            // alert(`어서오세요. ${data.username}님`);
-            if (!!data == true) {
-              // 로그인 상태일 때, "로그인" 버튼을 숨기고 "로그아웃" 버튼을 보여줍니다.
-              document.getElementById('signoutButton').classList.add('d-none');
-              document
-                .getElementById('signinButton')
-                .classList.remove('d-none');
-            }
-          })
-          .catch((error) => {
-            console.error('에러 발생:', error);
-            // 비로그인 상태일 때, "로그아웃" 버튼을 숨기고 "로그인" 버튼을 보여줍니다.
-            document.getElementById('signoutButton').classList.add('d-none');
-            document.getElementById('signinButton').classList.remove('d-none');
-          });
-      }
+      // // 시간이 된다면 로그아웃 구현
+      // // API를 호출하여 로그인 상태를 확인하고 버튼을 동적으로 변경하는 함수
+      // function checkLoginStatus() {
+      //   // 서버로 GET 요청 보내서 로그인 상태를 확인합니다.
+      //   fetch('/api/user')
+      //     .then((response) => {
+      //       if (response.ok) {
+      //         return response.json();
+      //       } else {
+      //         // 비로그인 상태일 때, "로그아웃" 버튼을 숨기고 "로그인" 버튼을 보여줍니다.
+      //         document.getElementById('signoutButton').classList.add('d-none');
+      //         document
+      //           .getElementById('signinButton')
+      //           .classList.remove('d-none');
+      //       }
+      //     })
+      //     .then((data) => {
+      //       // alert(`어서오세요. ${data.username}님`);
+      //       if (!!data == true) {
+      //         // 로그인 상태일 때, "로그인" 버튼을 숨기고 "로그아웃" 버튼을 보여줍니다.
+      //         document.getElementById('signoutButton').classList.add('d-none');
+      //         document
+      //           .getElementById('signinButton')
+      //           .classList.remove('d-none');
+      //       }
+      //     })
+      //     .catch((error) => {
+      //       console.error('에러 발생:', error);
+      //       // 비로그인 상태일 때, "로그아웃" 버튼을 숨기고 "로그인" 버튼을 보여줍니다.
+      //       document.getElementById('signoutButton').classList.add('d-none');
+      //       document.getElementById('signinButton').classList.remove('d-none');
+      //     });
+      // }
 
-      // 페이지 로딩 시 로그인 상태를 확인하고 버튼 상태를 변경하는 함수를 호출합니다.
-      checkLoginStatus();
+      // // 페이지 로딩 시 로그인 상태를 확인하고 버튼 상태를 변경하는 함수를 호출합니다.
+      // checkLoginStatus();
     </script>
   </body>
 </html>

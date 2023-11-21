@@ -8,7 +8,7 @@ import ErrorHandlingMiddleware from './middlewares/error-handling.middleware.js'
 const app = express();
 const PORT = 3334;
 
-app.use(logMiddleware);
+// app.use(logMiddleware);
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.static('public'));

@@ -1,0 +1,45 @@
+config:
+  environments:
+    local:
+      target: 'http://localhost:3334'
+      phases:
+        - duration: 30
+          arrivalRate: 1
+          name: Warm up
+      defaults:
+        User-Agent: 'Artiilery'
+      payload:
+        path: 'users.csv'
+        fields:
+          - 'username'
+          - 'password'
+# variables:
+#   - name: "showIds"
+#     values: [1, 2, 3]
+
+scenarios:
+  - name: '회원가입'
+    flow:
+      - post:
+          url: '/api/sign-up'
+          json:
+            username: '{{username}}'
+            password: '{{password}}'
+      # - post:
+      #     url: '/api/sign-in'
+      #     json:
+      #       username: '{{username}}'
+      #       password: '{{password}}'
+      # - get:
+      #     url: "/api/reservation"
+      # - loop:
+      #     - set:
+      #         var: "showId"
+      #         value: "{{ $randomItem(showIds)}}"
+      #     - get:
+      #         url: "/api/reservation/{{ showId }}"
+      #     - post:
+      #         url: "/api/reservation/{{ showId }}"
+# 테스트 실행 코드 : artillery.cmd run --output report.json ./artillery_script/scenario_1.yaml
+# 테스트 로컬 실행 코드 : artillery run -e local --output report.json ./artillery_script/scenario_1.yaml
+# 요약 보고서 html 확인 : artillery.cmd report report.json

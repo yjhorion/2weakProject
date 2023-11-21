@@ -78,6 +78,7 @@
               class="form-control"
               id="password"
               name="login_userPw"
+              autocomplete="username"
             />
             <div id="emailHelp" class="form-text">
               영어와 숫자만 입력해주세요.
@@ -118,7 +119,11 @@
             alert(data.message)
             window.location.href = '/';
         } else {
-          alert(data.message)  
+          if (data.error) {
+            alert(data.error)            
+          } else{
+            alert(data.message)
+          }
         }          
         })
         .catch((error) => {
