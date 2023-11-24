@@ -41,8 +41,8 @@ model Reservation {
   UserId        Int   @map("UserId")
   ShowId        Int   @map("ShowId")
    
-  Show  Shows         @relation(fields: [ShowId], references: [showId], onDelete:Cascade)
-  User  Users         @relation(fields: [UserId], references: [userId], onDelete:Cascade)
+  Show  Shows         @relation(fields: [ShowId], references: [showId], onUpdate:Cascade)
+  User  Users         @relation(fields: [UserId], references: [userId], onUpdate:Cascade)
 
   @@map("Reservation")
 }

@@ -1,0 +1,59 @@
+config:
+  environments:
+    local:
+      target: 'http://localhost:3334'
+      phases:
+        - duration: 1
+          arrivalRate: 1
+          name: Warm up
+      defaults:
+        User-Agent: 'Artillery'
+      payload:
+        - path: 'users.csv'
+          fields:
+            - 'username'
+            - 'password'
+        - path: 'usersToken.csv'
+          fields:
+            - 'userToken'
+scenarios:
+  # - name: '공연 예매 조회'
+  - name: '예매'
+    flow:
+      # 회원가입
+      # - post:
+      #     url: '/api/sign-up'
+      #     json:
+      #       username: '{{username}}'
+      #       password: '{{password}}'
+      # 로그인
+      # - post:
+      #     url: '/api/sign-in'
+      #     json:
+      #       username: '{{username}}'
+      #       password: '{{password}}'
+      # 공연 목록 조회
+      - get:
+          url: '/api/reservation'
+      # # 공연 상세 조회
+      # - get:
+      #     url: '/api/reservation/1'
+      # - get:
+      #     url: '/api/reservation/2'
+      # - get:
+      #     url: '/api/reservation/3'
+      # - loop:
+      #     - post:
+      #         url: '/api/reservation/3'
+      #         headers:
+      #           authorization: '{{userToken}}'
+      #   count: 10
+    # 공연 예매 내역 조회
+    # - get:
+    #     url: '/api/reservation/detail/user'
+    #     headers:
+    #       authorization: '{{userToken}}'
+# 테스트 실행 코드 : artillery.cmd run --output report.json ./artillery_script/scenario_1.yaml
+# 테스트 로컬 실행 코드 : artillery run -e local --output report.json ./artillery_script/scenario_1.yaml
+# 요약 보고서 html 확인 : artillery.cmd report report.json
+# 요약 보고서 html 확인 : artillery report report.json

@@ -3,50 +3,25 @@ config:
     local:
       target: 'http://localhost:3334'
       phases:
-        - duration: 1
-          arrivalRate: 5
+        - duration: 60
+          arrivalRate: 100
           name: Warm up
       defaults:
         User-Agent: 'Artillery'
       payload:
-        path: 'users.csv'
-        fields:
-          - 'username'
-          - 'password'
-# variables:
-#   - name: "showIds"
-#     values: [1, 2, 3]
-
+        - path: 'usersToken.csv'
+          fields:
+            - 'userToken'
 scenarios:
-  - name: '로그인, 예매'
+  - name: '예매'
     flow:
-    #   - post:
-    #       url: '/api/sign-in'
-    #       json:
-    #         username: 'YJH'
-    #         password: '12341234'
-
-      - post:
-          url: '/api/reservation/1'
-          headers :
-           authorization : 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE4LCJpYXQiOjE3MDA1NzA5MDksImV4cCI6MTcwMDU3MTkwOX0.R9ycM4k5-JdO3OayP7xpONUvkh-AXamVcbZLs_0q-KI'
-          #  authorization : 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE4LCJpYXQiOjE3MDA1NzA5MDksImV4cCI6MTcwMDU3MTkwOX0.R9ycM4k5-JdO3OayP7xpONUvkh-AXamVcbZLs_0q-KI; Path=/; Domain=localhost' 
-
-      # - post:
-      #     url: '/api/sign-in'
-      #     json:
-      #       username: '{{username}}'
-      #       password: '{{password}}'
-      # - get:
-      #     url: "/api/reservation"
-      # - loop:
-      #     - set:
-      #         var: "showId"
-      #         value: "{{ $randomItem(showIds)}}"
-      #     - get:
-      #         url: "/api/reservation/{{ showId }}"
-      #     - post:
-      #         url: "/api/reservation/{{ showId }}"
+      - loop:
+          - post:
+              url: '/api/reservation/3'
+              headers:
+                authorization: '{{userToken}}'
+        count: 10
 # 테스트 실행 코드 : artillery.cmd run --output report.json ./artillery_script/scenario_1.yaml
 # 테스트 로컬 실행 코드 : artillery run -e local --output report.json ./artillery_script/scenario_1.yaml
 # 요약 보고서 html 확인 : artillery.cmd report report.json
+# 요약 보고서 html 확인 : artillery report report.json
