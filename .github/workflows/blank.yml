@@ -17,13 +17,13 @@ jobs:
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh/
-          echo "${{ secrets.SSH_PRIVATE_KEY_NGINX }}" > ~/.ssh/id_rsa2
-          chmod 400 ~/.ssh/id_rsa2
+          echo "${{ secrets.SSH_PRIVATE_KEY_NGINX }}" > ~/.ssh/id_rsa
+          chmod 400 ~/.ssh/id_rsa
           ssh-keyscan -H 3.34.183.12 >> ~/.ssh/known_hosts
 
       - name: SSH to EC2 and perform actions
         run: |
-            ssh -i ~/.ssh/id_rsa2 ubuntu@3.34.183.12 `
+            ssh -i ~/.ssh/id_rsa ubuntu@3.34.183.12 `
             # sudo systemctl stop your_service_name &&
             cd /home/ubuntu/2weekProject &&
             git fetch --all &&
@@ -54,7 +54,7 @@ jobs:
 
       - name: SSH to EC2 and perform actions
         run: |
-            ssh -i ~/.ssh/id_rsa2 ubuntu@3.39.194.231 `
+            ssh -i ~/.ssh/id_rsa ubuntu@3.39.194.231 `
             # sudo systemctl stop your_service_name &&
             cd /home/ubuntu/2weekProject &&
             git fetch --all &&
