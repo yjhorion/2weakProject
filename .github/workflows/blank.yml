@@ -25,8 +25,8 @@ jobs:
         run: |
          ssh -i ~/.ssh/id_rsa ubuntu@3.34.183.12 `
             # sudo systemctl stop your_service_name &&
-            git fetch --all &&
             cd /home/ubuntu/2weekProject &&
+            git fetch --all &&
             git reset --hard origin/main &&
             echo "DATABASE_URL=\"mysql://root:aaaa4321@express-database.cpjbd8npultq.ap-northeast-2.rds.amazonaws.com:3306/testfront\"" >> .env &&
             curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash - &&
@@ -56,8 +56,8 @@ jobs:
         run: |
           ssh -i ~/.ssh/id_rsa ubuntu@3.39.194.231 `
             # sudo systemctl stop your_service_name &&
-            git fetch --all &&
             cd /home/ubuntu/2weekProject &&
+            git fetch --all &&
             git reset --hard origin/main &&
             echo "DATABASE_URL=\"mysql://root:aaaa4321@express-database.cpjbd8npultq.ap-northeast-2.rds.amazonaws.com:3306/testfront\"" >> .env &&
             curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash - &&
