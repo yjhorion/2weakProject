@@ -23,7 +23,7 @@ jobs:
 
       - name: SSH to EC2 and perform actions
         run: |
-            ssh -i ~/.ssh/id_rsa2 ubuntu@3.34.183.12 '
+            ssh -i ~/.ssh/id_rsa2 ubuntu@3.34.183.12 `
             # sudo systemctl stop your_service_name &&
             cd /home/ubuntu/2weekProject &&
             git fetch --all &&
@@ -36,7 +36,7 @@ jobs:
             npm install -g pm2 &&
             pm2 start /scr/app.js &&
             sudo systemctl start your_service_name
-            
+            `
           
   deploy2:
     runs-on: ubuntu-latest
@@ -54,7 +54,7 @@ jobs:
 
       - name: SSH to EC2 and perform actions
         run: |
-            ssh -i ~/.ssh/id_rsa2 ubuntu@3.39.194.231 '
+            ssh -i ~/.ssh/id_rsa2 ubuntu@3.39.194.231 `
             # sudo systemctl stop your_service_name &&
             cd /home/ubuntu/2weekProject &&
             git fetch --all &&
@@ -67,5 +67,5 @@ jobs:
             npm install -g pm2 &&
             pm2 start /scr/app.js &&
             sudo systemctl start your_service_name
-            
+            `
           
