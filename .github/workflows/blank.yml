@@ -24,7 +24,7 @@ jobs:
       - name: SSH to EC2 and perform actions
         run: |
          ssh -i ~/.ssh/id_rsa3 ubuntu@3.34.183.12 '
-            cd /home/ubuntu/2weekproject &&
+            cd /home/ubuntu/2weekProject &&
             git init &&
             # git remote add origin https://github.com/yjhorion/2weekProject.git &&
             git pull origin dev &&
