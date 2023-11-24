@@ -18,15 +18,13 @@ jobs:
         run: |
           mkdir -p ~/.ssh/
           echo "${{ secrets.SSH_PRIVATE_KEY_NGINX }}" > ~/.ssh/id_rsa2
-          chmod 600 ~/.ssh/id_rsa2
+          chmod 400 ~/.ssh/id_rsa2
           ssh-keyscan -H 3.34.183.12 >> ~/.ssh/known_hosts
-
-      - name: Create project directory
-        run: ssh -i ~/.ssh/id_rsa2 ubuntu@3.34.183.12 'mkdir -p /home/ubuntu/2weekProject'
 
       - name: SSH to EC2 and perform actions
         run: |
-          ssh -i ~/.ssh/id_rsa2 ubuntu@3.34.183.12 '
+            ssh -i ~/.ssh/id_rsa2 ubuntu@3.34.183.12 `
+            # sudo systemctl stop your_service_name &&
             cd /home/ubuntu/2weekProject &&
             git fetch --all &&
             git reset --hard origin/main &&
@@ -38,8 +36,8 @@ jobs:
             npm install -g pm2 &&
             pm2 start /scr/app.js &&
             sudo systemctl start your_service_name
-          '
-
+            `
+          
   deploy2:
     runs-on: ubuntu-latest
 
@@ -51,15 +49,13 @@ jobs:
         run: |
           mkdir -p ~/.ssh/
           echo "${{ secrets.SSH_PRIVATE_KEY_NGINX }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
+          chmod 400 ~/.ssh/id_rsa
           ssh-keyscan -H 3.39.194.231 >> ~/.ssh/known_hosts
-
-      - name: Create project directory
-        run: ssh -i ~/.ssh/id_rsa ubuntu@3.39.194.231 'mkdir -p /home/ubuntu/2weekProject'
 
       - name: SSH to EC2 and perform actions
         run: |
-          ssh -i ~/.ssh/id_rsa ubuntu@3.39.194.231 '
+            ssh -i ~/.ssh/id_rsa2 ubuntu@3.39.194.231 `
+            # sudo systemctl stop your_service_name &&
             cd /home/ubuntu/2weekProject &&
             git fetch --all &&
             git reset --hard origin/main &&
@@ -71,4 +67,4 @@ jobs:
             npm install -g pm2 &&
             pm2 start /scr/app.js &&
             sudo systemctl start your_service_name
-          '
+            `
