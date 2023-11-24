@@ -23,7 +23,7 @@ jobs:
 
       - name: SSH to EC2 and perform actions
         run: |
-            ssh -i ~/.ssh/id_rsa ubuntu@3.34.183.12 `
+         ssh -i ~/.ssh/id_rsa ubuntu@3.34.183.12 `
             # sudo systemctl stop your_service_name &&
             git fetch --all &&
             cd /home/ubuntu/2weekProject &&
@@ -54,7 +54,7 @@ jobs:
 
       - name: SSH to EC2 and perform actions
         run: |
-            ssh -i ~/.ssh/id_rsa ubuntu@3.39.194.231 `
+          ssh -i ~/.ssh/id_rsa ubuntu@3.39.194.231 `
             # sudo systemctl stop your_service_name &&
             git fetch --all &&
             cd /home/ubuntu/2weekProject &&
