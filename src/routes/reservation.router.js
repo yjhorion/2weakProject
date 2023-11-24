@@ -93,45 +93,35 @@ router.post('/reservation/:showId', authMiddleware, async (req, res, next) => {
 
     transaction = await prisma.$transaction(
       async (tx) => {
-        const show = await tx.shows.findFirst({
-          where: { showId: +showId },
-        });
-
-        if (!show) {
-          console.log(`${userId} : 공연없음`);
-          return res.status(400).json({ message: '찾는 공연이 없습니다.' });
-        }
-
         const user = await tx.users.findFirst({
           where: { userId: +userId },
         });
-        //트랜잭션의 일관성은 유지가 되나, 0개 이상 구
-        //트랜잭션이 0 이하일경우 참조되지않도록하는 방법
-        if (show.quantity > 0) {
-          // await prisma.shows.update({
-          //   where: { showId: +showId },
-          //   data: { quantity: { decrement: 1 } },
-          // });
-          await tx.$executeRaw`UPDATE Shows SET quantity = quantity-1 WHERE showId=${showId};`;
-        } else {
-          console.log(`${userId} : 예매수량부족`);
-          throw new Error('예매 수량이 부족합니다.');
+
+        await tx.$executeRaw`UPDATE Shows SET quantity = quantity-1 WHERE showId=${showId};`;
+
+        const updatedShow = await prisma.shows.findFirst({
+          where: { showId: +showId },
+        });
+
+        if (!updatedShow) {
+          console.log(`없는 show`);
+          throw new Error('존재하지 않는 show 입니다');
         }
 
-        if (user.credit >= show.price) {
-          // await tx.users.update({
-          //   where: { userId: +userId },
-          //   data: { credit: user.credit - show.price },
-          // });
-          await tx.$executeRaw`UPDATE users SET credit = credit - ${show.price} WHERE userId=${userId};`;
-          // await tx.reservation.create({
-          //   data: { UserId: user.userId, ShowId: show.showId },
-          // });
-          await tx.$executeRaw`INSERT INTO reservation(UserId, ShowId) VALUES (${user.userId}, ${show.showId});`;
+        if (updatedShow.quantity <= 0) {
+          console.log(`${userId} : 예매수량부족`);
+          throw new Error('예매 수량이 부족합니다.');
         } else {
+          await tx.$executeRaw`UPDATE users SET credit = credit - ${updatedShow.price} WHERE userId=${userId};`;
+          await tx.$executeRaw`INSERT INTO reservation(UserId, ShowId) VALUES (${user.userId}, ${updatedShow.showId});`;
+        }
+        const updatedUser = await tx.users.findFirst({
+          where: { userId: +userId },
+        });
+        if (updatedUser.credit < 0 ) {
           console.log(`${userId} : credit부족`);
           throw new Error('보유한 credit이 부족합니다.');
-        }
+        } 
       },
       {
         isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead,
@@ -146,5 +136,39 @@ router.post('/reservation/:showId', authMiddleware, async (req, res, next) => {
     }
   }
 });
+
+/* user credit 충전 */
+router.post('/editUserInfo/:credit', authMiddleware, async (req, res, next) => {
+  try {
+    const { userId } = req.user;
+    const { credit } = req.params;
+    await prisma.users.update({
+      where: { userId },
+      data: {
+        credit: +credit,
+      },
+    });
+    return res.status(201).json({});
+  } catch (error) {
+    next(error);
+  }
+});
+
+/* show 정보 수정 */
+router.post('/editShowInfo/:showId/:quantity', async (req, res, next) => {
+  try{
+    const { showId,  quantity } = req.params
+    const show = await prisma.shows.update({
+      where : { showId : +showId},
+      data : {
+        quantity : +quantity
+      }
+    })
+    return res.status(201).json({ data : show.quantity })
+  } catch (error) {
+    next(error)
+  }
+})
+
 
 export default router;

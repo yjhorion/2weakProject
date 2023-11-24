@@ -3,8 +3,8 @@ config:
     local:
       target: 'http://localhost:3334'
       phases:
-        - duration: 60
-          arrivalRate: 100
+        - duration: 20
+          arrivalRate: 5
           name: Warm up
       defaults:
         User-Agent: 'Artillery'
@@ -17,10 +17,10 @@ scenarios:
     flow:
       - loop:
           - post:
-              url: '/api/reservation/3'
+              url: '/api/reservation/2'
               headers:
                 authorization: '{{userToken}}'
-        count: 10
+        count: 30
 # 테스트 실행 코드 : artillery.cmd run --output report.json ./artillery_script/scenario_1.yaml
 # 테스트 로컬 실행 코드 : artillery run -e local --output report.json ./artillery_script/scenario_1.yaml
 # 요약 보고서 html 확인 : artillery.cmd report report.json
