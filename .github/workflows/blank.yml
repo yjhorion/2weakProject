@@ -36,6 +36,7 @@ jobs:
             npm install -g pm2 &&
             pm2 start /scr/app.js &&
             sudo systemctl start your_service_name
+            '
           
   deploy2:
     runs-on: ubuntu-latest
@@ -66,4 +67,5 @@ jobs:
             npm install -g pm2 &&
             pm2 start /scr/app.js &&
             sudo systemctl start your_service_name
+            '
           
