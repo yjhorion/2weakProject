@@ -26,7 +26,7 @@ jobs:
          ssh -i ~/.ssh/id_rsa3 ubuntu@3.34.183.12 '
             cd /home/ubuntu/2weekproject &&
             git init &&
-            git remote add origin https://github.com/yjhorion/2weekProject.git &&
+            # git remote add origin https://github.com/yjhorion/2weekProject.git &&
             git pull origin dev &&
             echo "DATABASE_URL=\"mysql://root:aaaa4321@express-database.cpjbd8npultq.ap-northeast-2.rds.amazonaws.com:3306/testfront\"" >> .env &&
             curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash - &&
