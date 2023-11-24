@@ -25,7 +25,7 @@ jobs:
         run: |
          ssh -i ~/.ssh/id_rsa ubuntu@3.34.183.12 `
             # sudo systemctl stop your_service_name &&
-            cd /home/ubuntu &&
+            cd /home/ubuntu/2weekproject &&
             git fetch --all &&
             git reset --hard origin/main &&
             echo "DATABASE_URL=\"mysql://root:aaaa4321@express-database.cpjbd8npultq.ap-northeast-2.rds.amazonaws.com:3306/testfront\"" >> .env &&
@@ -56,7 +56,7 @@ jobs:
         run: |
           ssh -i ~/.ssh/id_rsa ubuntu@3.39.194.231 `
             # sudo systemctl stop your_service_name &&
-            cd /home/ubuntu &&
+            cd /home/ubuntu/2weekproject &&
             git fetch --all &&
             git reset --hard origin/main &&
             echo "DATABASE_URL=\"mysql://root:aaaa4321@express-database.cpjbd8npultq.ap-northeast-2.rds.amazonaws.com:3306/testfront\"" >> .env &&
