@@ -13,10 +13,10 @@ jobs:
           mkdir -p ~/.ssh/
           echo "${{ secrets.SSH_PRIVATE_KEY_NGINX }}" > ~/.ssh/id_rsa
           chmod 400 ~/.ssh/id_rsa
-          ssh-keyscan -H 3.34.183.12 >> ~/.ssh/known_hosts
+          ssh-keyscan -H 43.201.77.212 >> ~/.ssh/known_hosts
       - name: SSH to EC2 and perform actions
         run: |
-          ssh -i ~/.ssh/id_rsa ubuntu@3.34.183.12 '
+          ssh -i ~/.ssh/id_rsa ubuntu@43.201.77.212 '
             # sudo systemctl stop your_service_name &&
             cd /home/ubuntu/2weekProject &&
             git fetch --all &&
@@ -41,10 +41,10 @@ jobs:
           mkdir -p ~/.ssh/
           echo "${{ secrets.SSH_PRIVATE_KEY_NGINX }}" > ~/.ssh/id_rsa
           chmod 400 ~/.ssh/id_rsa
-          ssh-keyscan -H 3.39.194.231 >> ~/.ssh/known_hosts
+          ssh-keyscan -H 43.201.9.239 >> ~/.ssh/known_hosts
       - name: SSH to EC2 and perform actions
         run: |
-          ssh -i ~/.ssh/id_rsa ubuntu@3.39.194.231 '
+          ssh -i ~/.ssh/id_rsa ubuntu@43.201.9.239 '
             # sudo systemctl stop your_service_name &&
             cd /home/ubuntu/2weekProject &&
             git fetch --all &&
