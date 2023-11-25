@@ -28,7 +28,7 @@ jobs:
             sudo yarn &&
             sudo npm install -g pm2 &&
             sudo pm2 kill &&
-            sudo pm2 start -f src/app.js &&
+            sudo pm2 start -f src/app.js
             # sudo systemctl start your_service_name
           '
   deploy2:
@@ -56,7 +56,7 @@ jobs:
             sudo yarn &&
             sudo npm install -g pm2 &&
             sudo pm2 kill &&
-            sudo pm2 start -f src/app.js &&
+            sudo pm2 start -f src/app.js
             # sudo systemctl start your_service_name
           '
 # name: Deploy to EC2
