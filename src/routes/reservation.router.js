@@ -112,8 +112,8 @@ router.post('/reservation/:showId', authMiddleware, async (req, res, next) => {
           console.log(`${userId} : 예매수량부족`);
           throw new Error('예매 수량이 부족합니다.');
         } else {
-          await tx.$executeRaw`UPDATE users SET credit = credit - ${updatedShow.price} WHERE userId=${userId};`;
-          await tx.$executeRaw`INSERT INTO reservation(UserId, ShowId) VALUES (${user.userId}, ${updatedShow.showId});`;
+          await tx.$executeRaw`UPDATE Users SET credit = credit - ${updatedShow.price} WHERE userId=${userId};`;
+          await tx.$executeRaw`INSERT INTO Reservation(UserId, ShowId) VALUES (${user.userId}, ${updatedShow.showId});`;
         }
         const updatedUser = await tx.users.findFirst({
           where: { userId: +userId },
