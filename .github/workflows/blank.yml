@@ -1,61 +1,24 @@
-name: Deploy to EC2
-
 on:
   push:
     branches:
       - main
-      - dev
-
 jobs:
   deploy1:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh/
-          echo "${{ secrets.SSH_PRIVATE_KEY_NGINX }}" > ~/.ssh/id_rsa3
-          chmod 400 ~/.ssh/id_rsa3
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 400 ~/.ssh/id_rsa
           ssh-keyscan -H 3.34.183.12 >> ~/.ssh/known_hosts
-
       - name: SSH to EC2 and perform actions
         run: |
-         ssh -i ~/.ssh/id_rsa3 ubuntu@3.34.183.12 '
+          ssh -i ~/.ssh/id_rsa ubuntu@3.34.183.12 '
+            # sudo systemctl stop your_service_name &&
             cd /home/ubuntu/2weekProject &&
-            git init &&
-            # git remote add origin https://github.com/yjhorion/2weekProject.git &&
-            git pull origin dev &&
-            echo "DATABASE_URL=\"mysql://root:aaaa4321@express-database.cpjbd8npultq.ap-northeast-2.rds.amazonaws.com:3306/testfront\"" >> .env &&
-            curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash - &&
-            sudo apt-get install -y nodejs &&
-            npm install -g yarn &&
-            yarn &&
-            npm install -g pm2 &&
-            pm2 start /src/app.js &&
-            sudo systemctl start your_service_name
-            '
-          
-  deploy2:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Setup SSH
-        run: |
-          mkdir -p ~/.ssh/
-          echo "${{ secrets.SSH_PRIVATE_KEY_NGINX }}" > ~/.ssh/id_rsa3
-          chmod 400 ~/.ssh/id_rsa3
-          ssh-keyscan -H 3.39.194.231 >> ~/.ssh/known_hosts
-
-      - name: SSH to EC2 and perform actions
-        run: |
-          ssh -i ~/.ssh/id_rsa3 ubuntu@3.39.194.231 '
-            cd /home/ubuntu/2weekproject &&
             git fetch --all &&
             git reset --hard origin/main &&
             echo "DATABASE_URL=\"mysql://root:aaaa4321@express-database.cpjbd8npultq.ap-northeast-2.rds.amazonaws.com:3306/testfront\"" >> .env &&
@@ -64,6 +27,104 @@ jobs:
             npm install -g yarn &&
             yarn &&
             npm install -g pm2 &&
-            pm2 start /src/app.js &&
+            pm2 start /scr/app.js &&
             sudo systemctl start your_service_name
-            '
+          '
+  deploy2:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh/
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 400 ~/.ssh/id_rsa
+          ssh-keyscan -H 3.39.194.231 >> ~/.ssh/known_hosts
+      - name: SSH to EC2 and perform actions
+        run: |
+          ssh -i ~/.ssh/id_rsa ubuntu@3.39.194.231 '
+            # sudo systemctl stop your_service_name &&
+            cd /home/ubuntu/2weekProject &&
+            git fetch --all &&
+            git reset --hard origin/main &&
+            echo "DATABASE_URL=\"mysql://root:aaaa4321@express-database.cpjbd8npultq.ap-northeast-2.rds.amazonaws.com:3306/testfront\"" >> .env &&
+            curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash - &&
+            sudo apt-get install -y nodejs &&
+            npm install -g yarn &&
+            yarn &&
+            npm install -g pm2 &&
+            pm2 start /scr/app.js &&
+            sudo systemctl start your_service_name
+          '
+# name: Deploy to EC2
+
+# on:
+#   push:
+#     branches:
+#       - main
+#       - dev
+
+# jobs:
+#   deploy1:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v2
+
+#       - name: Setup SSH
+#         run: |
+#           mkdir -p ~/.ssh/
+#           echo "${{ secrets.SSH_PRIVATE_KEY_NGINX }}" > ~/.ssh/id_rsa3
+#           chmod 400 ~/.ssh/id_rsa3
+#           ssh-keyscan -H 3.34.183.12 >> ~/.ssh/known_hosts
+
+#       - name: SSH to EC2 and perform actions
+#         run: |
+#          ssh -i ~/.ssh/id_rsa3 ubuntu@3.34.183.12 '
+#             cd /home/ubuntu/2weekProject &&
+#             git init &&
+#             # git remote add origin https://github.com/yjhorion/2weekProject.git &&
+#             git pull origin dev &&
+#             echo "DATABASE_URL=\"mysql://root:aaaa4321@express-database.cpjbd8npultq.ap-northeast-2.rds.amazonaws.com:3306/testfront\"" >> .env &&
+#             curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash - &&
+#             sudo apt-get install -y nodejs &&
+#             npm install -g yarn &&
+#             yarn &&
+#             npm install -g pm2 &&
+#             pm2 start /src/app.js &&
+#             sudo systemctl start your_service_name
+#             '
+          
+#   deploy2:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v2
+
+#       - name: Setup SSH
+#         run: |
+#           mkdir -p ~/.ssh/
+#           echo "${{ secrets.SSH_PRIVATE_KEY_NGINX }}" > ~/.ssh/id_rsa3
+#           chmod 400 ~/.ssh/id_rsa3
+#           ssh-keyscan -H 3.39.194.231 >> ~/.ssh/known_hosts
+
+#       - name: SSH to EC2 and perform actions
+#         run: |
+#           ssh -i ~/.ssh/id_rsa3 ubuntu@3.39.194.231 '
+#             cd /home/ubuntu/2weekproject &&
+#             git fetch --all &&
+#             git reset --hard origin/main &&
+#             echo "DATABASE_URL=\"mysql://root:aaaa4321@express-database.cpjbd8npultq.ap-northeast-2.rds.amazonaws.com:3306/testfront\"" >> .env &&
+#             curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash - &&
+#             sudo apt-get install -y nodejs &&
+#             npm install -g yarn &&
+#             yarn &&
+#             npm install -g pm2 &&
+#             pm2 start /src/app.js &&
+#             sudo systemctl start your_service_name
+#             '
+
+#             name: Deploy to EC2
