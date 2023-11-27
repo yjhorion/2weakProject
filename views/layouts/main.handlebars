@@ -1,4 +1,4 @@
-<!-- /src/public/index.handlebars -->
+<!-- /src/public/index.html -->
 <!doctype html>
 <html lang="en">
   <head>
@@ -61,26 +61,22 @@
             </a>
           </div>
           <div class="col-12 col-md-6 navigation text-end mt-4">
-            <a href="/getReservDetail.handlebars" class="btn btn-link"
-              >예매조회</a
-            >
+            <a href="/getReservDetail.html" class="btn btn-link">예매조회</a>
             <a
-              href="/signin.handlebars"
+              href="/signin.html"
               id="signinButton"
               class="btn btn-success ms-3"
               onclick="login()"
               >로그인</a
             >
             <a
-              href="/signin.handlebars"
+              href="/signin.html"
               id="signoutButton"
               class="btn btn-success ms-3 d-none"
               onclick="logout()"
               >로그아웃</a
             >
-            <a href="/signup.handlebars" class="btn btn-success ms-3"
-              >회원가입</a
-            >
+            <a href="/signup.html" class="btn btn-success ms-3">회원가입</a>
           </div>
         </div>
       </div>
@@ -90,15 +86,20 @@
     <main>
       <div class="cards">
         <div class="card text-bg-dark mx-auto w-75 rounded-4">
-          <a href="/getReserv.handlebars?showId=1">
-            <img src="show1.gif" class="card-img" alt="..." id="poster" />
+          <a href="/getReserv?showId=1">
+            <img
+              src="show1.gif"
+              class="card-img"
+              alt="..."
+              id="poster"
+            />
             <div class="card-img-overlay">
               <h5 class="card-title">오페라의 유령</h5>
             </div>
           </a>
         </div>
         <div class="card text-bg-dark mx-auto mt-5 w-75 rounded-4">
-          <a href="/getReserv.handlebars?showId=2">
+          <a href="/getReserv.html?showId=2">
             <img src="show2.gif" class="card-img" alt="..." />
             <div class="card-img-overlay">
               <h5 class="card-title">일 테노레</h5>
@@ -106,7 +107,7 @@
           </a>
         </div>
         <div class="card text-bg-dark mx-auto mt-5 w-75 rounded-4">
-          <a href="/getReserv.handlebars?showId=3">
+          <a href="/getReserv.html?showId=3">
             <img src="show3.gif" class="card-img" alt="..." />
             <div class="card-img-overlay">
               <h5 class="card-title">레 미제라블</h5>

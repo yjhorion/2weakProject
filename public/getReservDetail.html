@@ -75,9 +75,13 @@
             </a>
           </div>
           <div class="col-12 col-md-6 navigation text-end mt-4">
-            <a href="/getReservDetail.html" class="btn btn-link">예매조회</a>
-            <a href="/signin.html" class="btn btn-success ms-3">로그인</a>
-            <a href="/signup.html" class="btn btn-success ms-3">회원가입</a>
+            <a href="/getReservDetail.handlebars" class="btn btn-link"
+              >예매조회</a
+            >
+            <a href="/signin.handlebars" class="btn btn-success ms-3">로그인</a>
+            <a href="/signup.handlebars" class="btn btn-success ms-3"
+              >회원가입</a
+            >
           </div>
         </div>
       </div>
@@ -147,7 +151,7 @@
           .then((data) => {
             if (data.message === '토큰이 존재하지않습니다.') {
               alert(data.message + ' 로그인을 다시 시도해주세요.');
-              window.location.href = '/signin.html';
+              window.location.href = '/signin.handlebars';
             }
             if (data.message === '해당 유저의 예매 정보가 없습니다.') {
               alert(data.message);
