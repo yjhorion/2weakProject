@@ -7,7 +7,7 @@ import ErrorHandlingMiddleware from './middlewares/error-handling.middleware.js'
 import { engine } from 'express-handlebars';
 
 const app = express();
-const PORT = 3335;
+const PORT = 3334;
 
 // app.use(logMiddleware);
 app.use(express.json());
