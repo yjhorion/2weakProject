@@ -106,14 +106,14 @@ router.get('/user', authMiddleware, async (req, res, next) => {
 });
 
 /** credit 충전 **/
-router.post('/editUserInfo/:credit', authMiddleware, async (req, res, next) => {
+router.post('/editUserInfo', authMiddleware, async (req, res, next) => {
   try {
     const { userId } = req.user;
-    const { credit } = req.params;
+    const { credit } = req.body;
     await prisma.users.update({
       where: { userId },
       data: {
-        credit: +credit,
+        credit
       },
     });
     return res.status(201).json({});
