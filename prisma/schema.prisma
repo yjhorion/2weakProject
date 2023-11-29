@@ -13,7 +13,7 @@ datasource db {
 
 model Users {
   userId    Int       @id @default(autoincrement()) @map("userId")
-  username  String    @map("userName")
+  username  String    @map("username")
   password  String    @map("password")
   credit    Int       @default(300000) @map("credit")
 

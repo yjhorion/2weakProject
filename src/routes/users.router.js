@@ -40,6 +40,7 @@ router.post('/sign-up', async (req, res, next) => {
 
     return res.status(200).json({ message: '회원가입 성공' });
   } catch (error) {
+    console.log('에러', error);
     next(error);
   }
 });
@@ -60,7 +61,9 @@ router.post('/sign-in', async (req, res, next) => {
       return res.status(400).json({ message: 'password를 확인해주세요.' });
     }
 
-    const token = jwt.sign({ userId: user.userId }, 'secretKey' 
+    const token = jwt.sign(
+      { userId: user.userId },
+      'secretKey',
       // expiresIn: '1000y',
     );
 

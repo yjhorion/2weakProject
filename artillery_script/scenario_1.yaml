@@ -3,7 +3,8 @@ config:
     local:
       target: 'http://localhost:3334'
       phases:
-        - duration: 60
+        # VU = duration * arrivalRate
+        - duration: 100
           arrivalRate: 100
           name: Warm up
       defaults:
@@ -20,7 +21,8 @@ scenarios:
               url: '/api/reservation/3'
               headers:
                 authorization: '{{userToken}}'
-        count: 10
+        #1인당 몇 번 할지
+        count: 1
 # 테스트 실행 코드 : artillery.cmd run --output report.json ./artillery_script/scenario_1.yaml
 # 테스트 로컬 실행 코드 : artillery run -e local --output report.json ./artillery_script/scenario_1.yaml
 # 요약 보고서 html 확인 : artillery.cmd report report.json

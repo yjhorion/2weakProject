@@ -1,0 +1,23 @@
+config:
+  environments:
+    local:
+      target: 'http://127.0.0.1:3334'
+      phases:
+        - duration: 1
+          arrivalRate: 1
+          name: Warm up
+      defaults:
+        User-Agent: 'Artillery'
+scenarios:
+  - name: '회원가입'
+    flow:
+      # 회원가입
+      - post:
+          url: '/api/sign-up'
+          json:
+            username: 'aaaa'
+            password: 'aaaa1111'
+# 테스트 실행 코드 : artillery.cmd run --output report.json ./artillery_script/scenario_1.yaml
+# 테스트 로컬 실행 코드 : artillery run -e local --output report.json ./artillery_script/scenario_1.yaml
+# 요약 보고서 html 확인 : artillery.cmd report report.json
+# 요약 보고서 html 확인 : artillery report report.json

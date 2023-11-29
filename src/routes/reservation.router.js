@@ -5,6 +5,140 @@ import authMiddleware from '../middlewares/auth.middleware.js';
 
 const router = express.Router();
 
+/** 공연 예매 최적화 전**/
+// router.post('/reservation/:showId', authMiddleware, async (req, res, next) => {
+//   let transaction;
+//   try {
+//     const { showId } = req.params;
+//     const { userId } = req.user;
+
+//     transaction = await prisma.$transaction(
+//       async (tx) => {
+//         const user = await tx.users.findFirst({
+//           where: { userId: +userId },
+//         });
+
+//         if (!user) {
+//           throw new Error('유저 정보를 찾을 수 없습니다.');
+//         }
+
+//         await tx.$queryRaw`SELECT * FROM Shows FOR UPDATE;`;
+
+//         let updatedShow = await prisma.shows.findFirst({
+//           where: { showId: +showId },
+//         });
+
+//         if (user.credit < updatedShow.price || user.credit === 0) {
+//           console.log(`${userId} : credit부족`);
+//           throw new Error('credit이 부족합니다.');
+//         }
+
+//         if (updatedShow.quantity <= 0) {
+//           console.log(`${userId} : 예매수량부족`);
+//           throw new Error('예매 수량이 부족합니다.');
+//         }
+
+//         await tx.Users.update({
+//           where: { userId: +userId },
+//           data: { credit: user.credit - updatedShow.price },
+//         });
+
+//         await tx.Shows.update({
+//           where: { showId: +showId },
+//           data: { quantity: { decrement: 1 } },
+//         });
+
+//         await tx.Reservation.create({
+//           data: {
+//             UserId: +user.userId,
+//             ShowId: +updatedShow.showId,
+//           },
+//         });
+//       },
+//       {
+//         isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted,
+//         timeout: 2000,
+//       },
+//     );
+//     return res.status(200).json({ message: '좌석 예매가 완료되었습니다.' });
+//   } catch (error) {
+//     console.log(`catch로 빠진 ${error}`);
+//     //if문 추가
+//     if (
+//       error instanceof PrismaClientKnownRequestError &&
+//       error.code === 'P2028'
+//     ) {
+//       console.error('PrismaClientKnownRequestError, P2028 에러발생');
+//     }
+//     next(error);
+//   }
+// });
+
+/** 공연 예매 최적화 후**/
+router.post('/reservation/:showId', authMiddleware, async (req, res, next) => {
+  let transaction;
+  try {
+    const { showId } = req.params;
+    const { userId } = req.user;
+
+    transaction = await prisma.$transaction(
+      async (tx) => {
+        const user = await tx.users.findFirst({
+          where: { userId: +userId },
+          select: { userId: true, credit: true },
+        });
+
+        if (!user) {
+          throw new Error('유저 정보를 찾을 수 없습니다.');
+        }
+
+        await tx.$queryRaw`SELECT * FROM Shows FOR UPDATE;`;
+
+        let updatedShow = await prisma.shows.findFirst({
+          where: { showId: +showId },
+          select: { price: true, quantity: true },
+        });
+
+        if (user.credit < updatedShow.price || user.credit === 0) {
+          console.log(`${userId} : credit부족`);
+          throw new Error('credit이 부족합니다.');
+        }
+
+        await tx.$executeRaw`UPDATE Users SET credit = credit - ${updatedShow.price} WHERE userId=${userId};`;
+
+        if (updatedShow.quantity <= 0) {
+          console.log(`${userId} : 예매수량부족`);
+          throw new Error('예매 수량이 부족합니다.');
+        }
+
+        await tx.$executeRaw`UPDATE Shows SET quantity = quantity-1 WHERE showId=${showId};`;
+
+        // let a = updatedShow.quantity -1;
+        // await tx.$executeRaw`UPDATE Shows SET quantity = quantity-1 WHERE showId=${showId};`; //(1) 최적화 후
+
+        await tx.$executeRaw`INSERT INTO Reservation(UserId, ShowId) VALUES (${user.userId}, ${showId});`;
+      },
+      {
+        isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted,
+        timeout: 2000,
+      },
+    );
+    return res.status(200).json({ message: '좌석 예매가 완료되었습니다.' });
+  } catch (error) {
+    // console.log(`catch로 빠진 ${error}`);
+    //if문 추가
+    if (
+      error instanceof PrismaClientKnownRequestError &&
+      error.code === 'P2028'
+    ) {
+      console.error('PrismaClientKnownRequestError, P2028 에러발생');
+    }
+    next(error);
+  }
+});
+
+/************************************************************************************/
+
 /** (메인) 공연 목록 조회 **/
 router.get('/reservation', async (req, res, next) => {
   try {
@@ -14,7 +148,6 @@ router.get('/reservation', async (req, res, next) => {
     }
     return res.status(200).json({ data: reservation });
   } catch (error) {
-    console.log(error);
     next(error);
   }
 });
@@ -33,7 +166,6 @@ router.get('/reservation/:showId', async (req, res, next) => {
 
     return res.status(200).json({ data: show });
   } catch (error) {
-    console.log(error);
     next(error);
   }
 });
@@ -83,68 +215,5 @@ router.get(
     }
   },
 );
-
-/** 공연 예매 **/
-router.post('/reservation/:showId', authMiddleware, async (req, res, next) => {
-  let transaction;
-  try {
-    const { showId } = req.params;
-    const { userId } = req.user;
-
-    transaction = await prisma.$transaction(
-      async (tx) => {
-        const show = await tx.shows.findFirst({
-          where: { showId: +showId },
-        });
-
-        if (!show) {
-          console.log(`${userId} : 공연없음`);
-          return res.status(400).json({ message: '찾는 공연이 없습니다.' });
-        }
-
-        const user = await tx.users.findFirst({
-          where: { userId: +userId },
-        });
-        //트랜잭션의 일관성은 유지가 되나, 0개 이상 구
-        //트랜잭션이 0 이하일경우 참조되지않도록하는 방법
-        if (show.quantity > 0) {
-          // await prisma.shows.update({
-          //   where: { showId: +showId },
-          //   data: { quantity: { decrement: 1 } },
-          // });
-          await tx.$executeRaw`UPDATE Shows SET quantity = quantity-1 WHERE showId=${showId};`;
-        } else {
-          console.log(`${userId} : 예매수량부족`);
-          throw new Error('예매 수량이 부족합니다.');
-        }
-
-        if (user.credit >= show.price) {
-          // await tx.users.update({
-          //   where: { userId: +userId },
-          //   data: { credit: user.credit - show.price },
-          // });
-          await tx.$executeRaw`UPDATE users SET credit = credit - ${show.price} WHERE userId=${userId};`;
-          // await tx.reservation.create({
-          //   data: { UserId: user.userId, ShowId: show.showId },
-          // });
-          await tx.$executeRaw`INSERT INTO reservation(UserId, ShowId) VALUES (${user.userId}, ${show.showId});`;
-        } else {
-          console.log(`${userId} : credit부족`);
-          throw new Error('보유한 credit이 부족합니다.');
-        }
-      },
-      {
-        isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead,
-      },
-    );
-    return res.status(200).json({ message: '좌석 예매가 완료되었습니다.' });
-  } catch (error) {
-    console.log(`catch로 빠진 ${error}`);
-    next(error);
-    if (transaction) {
-      await prisma.$executeRaw`ROLLBACK`;
-    }
-  }
-});
 
 export default router;
