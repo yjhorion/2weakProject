@@ -17,12 +17,12 @@ jobs:
       - name: SSH to EC2 and perform actions
         run: |
           ssh -i ~/.ssh/id_rsa ubuntu@43.200.171.118 '
+            sudo apt-get update &&
             # sudo systemctl stop your_service_name &&
             cd /home/ubuntu/2weekProject &&
             git fetch --all &&
             git reset --hard origin/dev &&
             sudo echo "DATABASE_URL=\"mysql://root:aaaa4321@express-database.cpjbd8npultq.ap-northeast-2.rds.amazonaws.com:3306/testfront\"" >> .env &&
-            sudo apt-get update &&
             sudo curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash - &&
             sudo apt-get install -y nodejs &&
             sudo npm install -g yarn &&
