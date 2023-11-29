@@ -1,6 +1,10 @@
 import express from 'express';
 import { prisma } from '../utils/prisma/index.js';
+import { Prisma } from '@prisma/client';
 import authMiddleware from '../middlewares/auth.middleware.js';
+// import { checkCache } from '../middlewares/checkCache.middleware.js'
+
+
 
 const router = express.Router();
 
@@ -8,7 +12,6 @@ const router = express.Router();
 router.get('/reservation', async (req, res, next) => {
   try {
     const reservation = await prisma.shows.findMany();
-
     if (!reservation) {
       return res.status(400).json({ message: '공연이 존재하지않습니다.' });
     }
@@ -50,21 +53,12 @@ router.get(
         where: { UserId: +userId },
       });
 
-      console.log('유저의 예매내역', reservations);
       if (reservations.length === 0) {
         return res
           .status(400)
           .json({ message: '해당 유저의 예매 정보가 없습니다.' });
       }
 
-      // const shows = await prisma.Shows.findMany({
-      //   where: { showId: +reservations.ShowId },
-      //   select: {
-      //     showName: true,
-      //     date: true,
-      //     location: true,
-      //   },
-      // });
       //여러 예매 내역 조회
       const shows = await Promise.all(
         reservations.map(async (reservation) => {
@@ -93,6 +87,14 @@ router.get(
   },
 );
 
+
+//  app.get('/get', checkCache, async (req, res) => {
+//     // 만약 redis(캐시 메모리)에 데이터가 없다면 DB에서 조회 → Cache Miss
+//     let data = await sequelize.query(`SELECT data FROM tables where id = ${req.key}`);
+//     await redisCli.set(key, data); // 그리고 그 데이터를 캐시에 저장하고 반환
+//     res.send(value);
+//  });
+
 /** 공연 예매 **/
 router.post('/reservation/:showId', authMiddleware, async (req, res, next) => {
   let transaction;
@@ -100,52 +102,72 @@ router.post('/reservation/:showId', authMiddleware, async (req, res, next) => {
     const { showId } = req.params;
     const { userId } = req.user;
 
-    const show = await prisma.shows.findFirst({
-      where: { showId: +showId },
-    });
-
-    if (!show) {
-      return res.status(400).json({ message: '찾는 공연이 없습니다.' });
-    }
-
-    const user = await prisma.users.findFirst({
-      where: { userId: +userId },
-    });
-
-    transaction = await prisma.$transaction(async (tx) => {
-      await tx.reservation.create({
-        data: { UserId: user.userId, ShowId: show.showId },
-      });
-
-      //예매한다면, show의 quantity 하나 줄이기
-      if (show.quantity > 0) {
-        await tx.shows.update({
-          where: { showId: +showId },
-          data: { quantity: --show.quantity },
-        });
-      } else {
-        return res.status(400).json({ message: '예매 수량이 부족합니다.' });
-      }
-      //계속해서 user의 credit도 줄어들기
-      if (user.credit > show.price) {
-        await tx.users.update({
+    transaction = await prisma.$transaction(
+      async (tx) => {
+        const user = await tx.users.findFirst({
           where: { userId: +userId },
-          data: { credit: user.credit - show.price },
+          select: { userId: true, credit: true },
         });
-      } else {
-        return res.status(400).json({ message: '보유한 credit이 부족합니다.' });
-      }
 
-      return res.status(200).json({ message: '좌석 예매가 완료되었습니다.' });
-    });
+        await tx.$executeRaw`UPDATE Shows SET quantity = quantity-1 WHERE showId=${showId};`;
+
+        const updatedShow = await prisma.shows.findFirst({
+          where: { showId: +showId },
+        });
+
+        if (!updatedShow) {
+          console.log(`없는 show`);
+          throw new Error('존재하지 않는 show 입니다');
+        }
+
+        if (updatedShow.quantity <= 0) {
+          console.log(`${userId} : 예매수량부족`);
+          throw new Error('예매 수량이 부족합니다.');
+        } else {
+          await tx.$executeRaw`UPDATE users SET credit = credit - ${updatedShow.price} WHERE userId=${userId};`;
+          await tx.$executeRaw`INSERT INTO reservation(UserId, ShowId) VALUES (${user.userId}, ${updatedShow.showId});`;
+          // querryRaw와 executeRaw 차이점 찾아보기.
+        }
+        const updatedUser = await tx.users.findFirst({
+          where: { userId: +userId },
+        });
+        if (updatedUser.credit < 0 ) {
+          console.log(`${userId} : credit부족`);
+          throw new Error('보유한 credit이 부족합니다.');
+        } 
+      },
+      {
+        isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead, timeout: 50
+      }, 
+    );
+    return res.status(200).json({ message: '좌석 예매가 완료되었습니다.' });
   } catch (error) {
-    console.log(error);
-
-    if (transaction) {
-      await prisma.$executeRaw`ROLLBACK`;
+    if (
+      error instanceof PrismaClientKnownRequestError &&
+      error.code === 'P2028'
+    ) {
+      console.error('PrismaClientKnownRequestError, P2028 에러발생');
     }
     next(error);
   }
 });
+
+
+/* show 정보 수정 */
+router.post('/editShowInfo/:showId/:quantity', async (req, res, next) => {
+  try{
+    const { showId,  quantity } = req.params
+    const show = await prisma.shows.update({
+      where : { showId : +showId},
+      data : {
+        quantity : +quantity
+      }
+    })
+    return res.status(201).json({ data : show.quantity })
+  } catch (error) {
+    next(error)
+  }
+})
+
 
 export default router;
