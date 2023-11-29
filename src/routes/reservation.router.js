@@ -139,6 +139,10 @@ router.post('/reservation/:showId', authMiddleware, async (req, res, next) => {
     }
     next(error);
   }
+    if (transaction) {
+      await prisma.$executeRaw`ROLLBACK`;
+    }
+  }
 });
 
 /* show 정보 수정 */
