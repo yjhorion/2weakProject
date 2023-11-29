@@ -16,6 +16,6 @@ app.use('/api', [UsersRouter, ReservationRouter]);
 
 app.use(ErrorHandlingMiddleware);
 
-app.listen(PORT, () => {
-  console.log(`http://127.0.0.1:${PORT}`);
-});
+// app.listen(PORT, () => {
+//   console.log(`http://127.0.0.1:${PORT}`);
+// });
