@@ -95,6 +95,7 @@ router.post('/reservation/:showId', authMiddleware, async (req, res, next) => {
       async (tx) => {
         const user = await tx.users.findFirst({
           where: { userId: +userId },
+          select: { userId: true, credit: true },
         });
 
         await tx.$executeRaw`UPDATE Shows SET quantity = quantity-1 WHERE showId=${showId};`;
@@ -112,8 +113,9 @@ router.post('/reservation/:showId', authMiddleware, async (req, res, next) => {
           console.log(`${userId} : 예매수량부족`);
           throw new Error('예매 수량이 부족합니다.');
         } else {
-          await tx.$executeRaw`UPDATE Users SET credit = credit - ${updatedShow.price} WHERE userId=${userId};`;
-          await tx.$executeRaw`INSERT INTO Reservation(UserId, ShowId) VALUES (${user.userId}, ${updatedShow.showId});`;
+          await tx.$executeRaw`UPDATE users SET credit = credit - ${updatedShow.price} WHERE userId=${userId};`;
+          await tx.$executeRaw`INSERT INTO reservation(UserId, ShowId) VALUES (${user.userId}, ${updatedShow.showId});`;
+          // querryRaw와 executeRaw 차이점 찾아보기.
         }
         const updatedUser = await tx.users.findFirst({
           where: { userId: +userId },
@@ -124,32 +126,17 @@ router.post('/reservation/:showId', authMiddleware, async (req, res, next) => {
         } 
       },
       {
-        isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead,
-      },
+        isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead, timeout: 1000
+      }, 
     );
     return res.status(200).json({ message: '좌석 예매가 완료되었습니다.' });
   } catch (error) {
-    console.log(`catch로 빠진 ${error}`);
-    next(error);
-    if (transaction) {
-      await prisma.$executeRaw`ROLLBACK`;
+    if (
+      error instanceof PrismaClientKnownRequestError &&
+      error.code === 'P2028'
+    ) {
+      console.error('PrismaClientKnownRequestError, P2028 에러발생');
     }
-  }
-});
-
-/* user credit 충전 */
-router.post('/editUserInfo/:credit', authMiddleware, async (req, res, next) => {
-  try {
-    const { userId } = req.user;
-    const { credit } = req.params;
-    await prisma.users.update({
-      where: { userId },
-      data: {
-        credit: +credit,
-      },
-    });
-    return res.status(201).json({});
-  } catch (error) {
     next(error);
   }
 });
