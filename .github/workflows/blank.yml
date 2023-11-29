@@ -22,9 +22,10 @@ jobs:
             git fetch --all &&
             git reset --hard origin/dev &&
             sudo echo "DATABASE_URL=\"mysql://root:aaaa4321@express-database.cpjbd8npultq.ap-northeast-2.rds.amazonaws.com:3306/testfront\"" >> .env &&
+            
             sudo apt-get update && sudo apt-get install -y ca-certificates curl gnupg &&
             
-            curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg &&
+            # curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg &&
             NODE_MAJOR=20 &&
             echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list &&
             
