@@ -64,7 +64,7 @@ jobs:
 
       - name: SSH to EC2 and perform actions
         run: |
-         ssh -i ~/.ssh/id_rsa3 ubuntu@43.200.171.118 '
+            ssh -i ~/.ssh/id_rsa3 ubuntu@43.200.171.118 '
               cd /home/ubuntu/2weekProject &&
               git init &&
               # git remote add origin https://github.com/yjhorion/2weekProject.git &&
@@ -86,8 +86,8 @@ jobs:
               sudo pm2 start /src/app.js &&
               # sudo systemctl start your_service_name
             '
-
-          
+            
+                      
 #   deploy2:
 #     runs-on: ubuntu-latest
 
