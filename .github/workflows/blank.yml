@@ -83,6 +83,7 @@ jobs:
                   sudo npm install -g yarn &&
                   sudo yarn &&
                   sudo npm install -g pm2 &&
+                  sudp npx prisma generate &&
                   sudo pm2 start src/app.js &&
                   sudo systemctl start pm2
                 '
