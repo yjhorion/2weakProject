@@ -19,7 +19,7 @@ jobs:
           ssh -i ~/.ssh/id_rsa ubuntu@43.200.171.118 '
             # sudo systemctl stop your_service_name &&
             cd /home/ubuntu/2weekProject &&
-            git fetch --all &&
+            # git fetch --all &&
             git reset --hard origin/dev &&
             sudo echo "DATABASE_URL=\"mysql://root:aaaa4321@express-database.cpjbd8npultq.ap-northeast-2.rds.amazonaws.com:3306/testfront\"" >> .env &&
             
