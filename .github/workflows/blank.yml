@@ -11,12 +11,12 @@ jobs:
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh/
-          echo "${{ secrets.SSH_PRIVATE_KEY_NGINX }}" > ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 400 ~/.ssh/id_rsa
-          ssh-keyscan -H 43.201.77.212 >> ~/.ssh/known_hosts
+          ssh-keyscan -H 43.200.171.118 >> ~/.ssh/known_hosts
       - name: SSH to EC2 and perform actions
         run: |
-          ssh -i ~/.ssh/id_rsa ubuntu@43.201.77.212 '
+          ssh -i ~/.ssh/id_rsa ubuntu@43.200.171.118 '
             # sudo systemctl stop your_service_name &&
             cd /home/ubuntu/2weekProject &&
             git fetch --all &&
@@ -31,34 +31,7 @@ jobs:
             sudo pm2 start -f src/app.js
             # sudo systemctl start your_service_name
           '
-  deploy2:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-      - name: Setup SSH
-        run: |
-          mkdir -p ~/.ssh/
-          echo "${{ secrets.SSH_PRIVATE_KEY_NGINX }}" > ~/.ssh/id_rsa
-          chmod 400 ~/.ssh/id_rsa
-          ssh-keyscan -H 43.201.9.239 >> ~/.ssh/known_hosts
-      - name: SSH to EC2 and perform actions
-        run: |
-          ssh -i ~/.ssh/id_rsa ubuntu@43.201.9.239 '
-            # sudo systemctl stop your_service_name &&
-            cd /home/ubuntu/2weekProject &&
-            git fetch --all &&
-            git reset --hard origin/dev &&
-            sudo echo "DATABASE_URL=\"mysql://root:aaaa4321@express-database.cpjbd8npultq.ap-northeast-2.rds.amazonaws.com:3306/testfront\"" >> .env &&
-            sudo curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash - &&
-            sudo apt-get install -y nodejs &&
-            sudo npm install -g yarn &&
-            sudo yarn &&
-            sudo npm install -g pm2 &&
-            sudo pm2 kill &&
-            sudo pm2 start -f src/app.js
-            # sudo systemctl start your_service_name
-          '
+  
 # name: Deploy to EC2
 
 # on:
