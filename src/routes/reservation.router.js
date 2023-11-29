@@ -100,27 +100,22 @@ router.post('/reservation/:showId', authMiddleware, async (req, res, next) => {
         });
 
         if (user.credit < updatedShow.price || user.credit === 0) {
-          console.log(`${userId} : credit부족`);
           throw new Error('credit이 부족합니다.');
         }
 
         await tx.$executeRaw`UPDATE Users SET credit = credit - ${updatedShow.price} WHERE userId=${userId};`;
 
         if (updatedShow.quantity <= 0) {
-          console.log(`${userId} : 예매수량부족`);
           throw new Error('예매 수량이 부족합니다.');
         }
 
         await tx.$executeRaw`UPDATE Shows SET quantity = quantity-1 WHERE showId=${showId};`;
 
-        // let a = updatedShow.quantity -1;
-        // await tx.$executeRaw`UPDATE Shows SET quantity = quantity-1 WHERE showId=${showId};`; //(1) 최적화 후
-
         await tx.$executeRaw`INSERT INTO Reservation(UserId, ShowId) VALUES (${user.userId}, ${showId});`;
       },
       {
         isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted,
-        timeout: 2000,
+        timeout: 1000,
       },
     );
     return res.status(200).json({ message: '좌석 예매가 완료되었습니다.' });
