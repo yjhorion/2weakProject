@@ -36,7 +36,9 @@ jobs:
             sudo pm2 start -f src/app.js
             # sudo systemctl start your_service_name
           '
-  
+
+
+
 # name: Deploy to EC2
 
 # on:
