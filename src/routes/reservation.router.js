@@ -137,7 +137,7 @@ router.post('/reservation/:showId', authMiddleware, async (req, res, next) => {
         } 
       },
       {
-        isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead, timeout: 50
+        isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead, timeout: 1000
       }, 
     );
     return res.status(200).json({ message: '좌석 예매가 완료되었습니다.' });
